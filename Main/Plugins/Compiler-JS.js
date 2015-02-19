@@ -10,10 +10,10 @@ var
   Path = require('path'),
   H = require('../H');
 class CompilerJS{
-  static RegexAppend:RegExp = /@(codekit-append|prepros-append|compiler-append)/;
-  static RegexOutput:RegExp = /@compiler-output/;
-  static RegexCompiler:RegExp = /@compiler-name/;
-  static RegexSourceMap:RegExp = /@compiler-sourcemap/;
+  static RegexAppend:RegExp = /@(codekit-append|prepros-append|Compiler-Append)/;
+  static RegexOutput:RegExp = /@Compiler-Output/;
+  static RegexCompiler:RegExp = /@Compiler-Name/;
+  static RegexSourceMap:RegExp = /@Compiler-Sourcemap/;
   static RegexExtract:RegExp = /".*"/;
   static ExtractValue(Line:String):Promise{
     return new Promise(function(resolve,reject){
