@@ -1,5 +1,6 @@
 
 
+// @Compiler-Output "../../Build/Plugins/Compiler-JS.js"
 var
   Promise = require('a-promise'),
   UglifyJS = null,
@@ -136,7 +137,7 @@ class CompilerJS{
             Output = null;
           if(Opts.Compiler === 'Babel'){
             Babel = Babel || require('babel');
-            Output = Babel.transform(Result.Contents,{sourceMap:HasSourceMap});
+            Output = Babel.transform(Result.Contents,{sourceMap:HasSourceMap, playground:true, experimental:true});
             ToReturn.Content = Output.code;
             if(HasSourceMap){
               ToReturn.SourceMap = JSON.stringify(Output.map);
@@ -152,7 +153,7 @@ class CompilerJS{
             Riot = Riot || require('riot');
             ToReturn.Content = Riot.compile(Result.Contents,{compact:true});
           }
-          if((!Opts.Compiler && Opts.SourceMap) || !Opts.SourceMap){
+          if(((!Opts.Compiler && Opts.SourceMap) || !Opts.SourceMap) && ToReturn.Content.substr(0,2) !== '#!'){
             UglifyJS = UglifyJS || require('uglify-js');
             Output = UglifyJS.minify(ToReturn.Content || Result.Content,{fromString: true,outSourceMap:HasSourceMap ? "js.map" : undefined});
             ToReturn.Content = Output.code;
