@@ -1,5 +1,5 @@
 {
-  "name": "Universal-Compiler",
+  "name": "universal-compiler",
   "version": "0.0.1",
   "description": "A universal Compiler for NodeJS",
   "main": "compiler-exec.js",
