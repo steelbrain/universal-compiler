@@ -38,10 +38,21 @@ class Compiler{
           return reject(`The given file type is not recognized`);
         }
         this.Map[Extension].Compiler.Process(SourceFile, Opts).then(function(Result){
-          console.log(Result);
-        }).catch(function(){
-          console.log(arguments);
-        });
+          Opts = Result.Opts;
+          if( !Opts.TargetFile ){
+            return resolve(Result);
+          }
+          FS.writeFile(Opts.TargetFile,Result.Content,function(Error){
+            if(Error){
+              return reject(Error);
+            }
+            if( Opts.SourceMap ){
+              FS.writeFile(Opts.SourceMap,Result.SourceMap, resolve);
+            } else {
+              resolve();
+            }
+          })
+        }).catch(reject);
 
       }.bind(this));
     }.bind(this));

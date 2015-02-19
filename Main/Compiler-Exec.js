@@ -7,6 +7,9 @@ if(!process.argv[2]){
 Compiler = new Compiler();
 Compiler.Compile(process.argv[2],process.argv[3],process.argv[4]).then(function(Result){
   console.log(Result);
+  if(!process.argv[3]){
+    process.stdout.write(Result.Content);
+  }
 }).catch(function(Error){
   console.log(Error.toString());
   console.log(Error.stack);
