@@ -13,18 +13,24 @@ class Compiler{
       'JSX': {Compiler: CompilerJS, Opts:{}}
     };
   }
-  Compile(SourceFile:String, TargetFile:String, SourceMap:String):String{
-    if(!this.FS.existsSync(SourceFile)){
-      throw new Error(`Source file ${SourceFile} doesn't exist`);
-    }
-    var
-      SourceDir = this.Path.dirname(SourceFile),
-      Extension = SourceFile.split('.').pop().toUpperCase();
-    if(!this.Map.hasOwnProperty(Extension)){
-      throw new Error("The given file type is not recognized");
-    }
-    var Result = this.Map[Extension].Compiler.Compile(SourceFile, this.Map[Extension].Opts);
-    console.log(Result);
+  Compile(SourceFile:String, TargetFile:String, SourceMap:String):Promise{
+    return new Promise(function(resolve,reject){
+      this.FS.exists(SourceFile,function(Status){
+        if(!Status){
+          return reject(`Source file ${SourceFile} doesn't exist`);
+        }
+
+        var
+          SourceDir = this.Path.dirname(SourceFile),
+          Extension = SourceFile.split('.').pop().toUpperCase();
+        if(!this.Map.hasOwnProperty(Extension)){
+          return reject(`The given file type is not recognized`);
+        }
+        this.Map[Extension].Compiler.Compile(SourceFile, this.Map[Extension].Opts).then(function(Result){
+          console.log(Result);
+        });
+      }.bind(this));
+    }.bind(this));
   }
 }
 module.exports = Compiler;

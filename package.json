@@ -14,7 +14,8 @@
     "uglify-js": "latest",
     "babel": "latest",
     "react-tools": "latest",
-    "riot": "latest"
+    "riot": "latest",
+    "a-promise": "latest"
   },
   "keywords": [
     "compiler",

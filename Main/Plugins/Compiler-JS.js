@@ -5,8 +5,11 @@ class CompilerJS{
   constructor(Main:Compiler){
     this.Main = Main;
   }
-  Compile(FilePath:String, Opts:Object):String{
-    return "test";
+  Compile(FilePath:String, Opts:Object):Promise{
+    var ToReturn = {SourceMap: "", Result: ""};
+    return new Promise(function(resolve){
+      resolve(ToReturn);
+    });
   }
 }
 module.exports = CompilerJS;
