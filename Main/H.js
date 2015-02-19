@@ -7,15 +7,16 @@ class H{
     if(Path1.slice(0,Path1.length-1).join(Path.sep) === Path2.slice(0,Path2.length-1).join(Path.sep)){
       return Path1.slice(0,Path1.length-1).join(Path.sep);
     }
-    var
-      Path1Reverse = Path1.slice().reverse(),
-      Path2Reverse = Path2.slice().reverse();
 
-    console.log(Path1)
-    console.log(Path2)
-    console.log(Path1Reverse)
-    console.log(Path2Reverse)
-    process.exit();
+    var RelativePath = [], I = null;
+    while(Path1.length && Path2.length && (Path1[0] === Path2[0])){
+      Path1.splice(Path1[0],1);
+      Path2.splice(Path2[0],1);
+    }
+    for(I = 0; I < Path1.length; ++I) RelativePath.push('..');
+    return RelativePath.length ?
+      RelativePath.join(Path.sep) + Path.sep + Path2.join(Path.sep) :
+      Path2.join(Path.sep);
   }
 }
 module.exports = H;
