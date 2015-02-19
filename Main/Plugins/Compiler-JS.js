@@ -1,8 +1,12 @@
 
 
 class CompilerJS{
-  static Compile(FilePath:String, Opts:Object):String{
-    return "JHA";
+  Main:Compiler;
+  constructor(Main:Compiler){
+    this.Main = Main;
+  }
+  Compile(FilePath:String, Opts:Object):String{
+    return "test";
   }
 }
 module.exports = CompilerJS;
