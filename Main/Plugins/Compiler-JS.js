@@ -1,24 +1,21 @@
 
 
 function requireUncached(LeModule){
-  delete require.cache[require.resolve(LeModule)]
+  delete require.cache[require.resolve(LeModule)];
   return require(LeModule)
 }
 
 var
   Promise = requireUncached('a-promise'),
-  //UglifyJS = requireUncached('uglify-js'),
-  //Babel = requireUncached('babel'),
-  //Riot = requireUncached('riot'),
-  //ReactTools = requireUncached('react-tools'),
   UglifyJS = null,
   Babel = null,
   Riot = null,
   ReactTools = null,
   FS = requireUncached('fs'),
-  Path = requireUncached('path');
+  Path = requireUncached('path'),
+  H = requireUncached('../H');
 class CompilerJS{
-  static RegexAppend:RegExp = /@(codekit-append|prepros-append|file-append)/;
+  static RegexAppend:RegExp = /@(codekit-append|prepros-append|compiler-append)/;
   static RegexOutput:RegExp = /@compiler-output/;
   static RegexCompiler:RegExp = /@compiler-name/;
   static RegexSourceMap:RegExp = /@compiler-sourcemap/;
@@ -106,7 +103,7 @@ class CompilerJS{
                 LineResolve();
               },LineReject);
             } else if(CompilerJS.RegexSourceMap.test(Line)) {
-              CompilerJS.ExtractPath(Line).then(function(Result){
+              CompilerJS.ExtractPath(Line, FileDir).then(function(Result){
                 if(Result === ''){
                   Opts.SourceMap = null;
                 } else {
@@ -134,6 +131,44 @@ class CompilerJS{
         }
         CompilerJS.Parse(FilePath,Contents.toString().split("\n"),Opts).then(function(Result){
           Opts = Result.Opts;
+          var
+            HasSourceMap = Opts.SourceMap !== null,
+            ToReturn = {
+              Content: '',
+              SourceMap: '',
+              Opts: Opts
+            },
+            Output = null;
+          if(Opts.Compiler === 'Babel'){
+            Babel = Babel || requireUncached('babel');
+            Output = Babel.transform(Result.Contents,{sourceMap:HasSourceMap});
+            ToReturn.Content = Output.code;
+            if(HasSourceMap){
+              ToReturn.SourceMap = JSON.stringify(Output.map);
+            }
+          } else if(Opts.Compiler === 'ReactTools'){
+            ReactTools = ReactTools || requireUncached('react-tools');
+            Output = ReactTools.transformWithDetails(Result.Contents,{harmony:true,stripTypes:true,sourceMap:HasSourceMap});
+            ToReturn.Content = Output.code;
+            if(HasSourceMap){
+              ToReturn.SourceMap = JSON.stringify(Output.sourceMap);
+            }
+          } else if(Opts.Compiler === 'Riot'){
+            Riot = Riot || requireUncached('riot');
+            ToReturn.Content = Riot.compile(Result.Contents,{compact:true});
+          }
+          if((!Opts.Compiler && Opts.SourceMap) || !Opts.SourceMap){
+            UglifyJS = UglifyJS || requireUncached('uglify-js');
+            Output = UglifyJS.minify(ToReturn.Content || Result.Content,{fromString: true,outSourceMap:HasSourceMap ? "js.map" : undefined});
+            ToReturn.Content = Output.code;
+            if(HasSourceMap){
+              ToReturn.SourceMap = Output.map;
+            }
+          }
+          if(HasSourceMap){
+            ToReturn.Content += '//# sourceMappingURL='+H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap);
+          }
+          resolve(ToReturn);
         },reject);
       })
     });
