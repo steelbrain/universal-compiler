@@ -1,19 +1,14 @@
 
 
-function requireUncached(LeModule){
-  delete require.cache[require.resolve(LeModule)];
-  return require(LeModule)
-}
-
 var
-  Promise = requireUncached('a-promise'),
+  Promise = require('a-promise'),
   UglifyJS = null,
   Babel = null,
   Riot = null,
   ReactTools = null,
-  FS = requireUncached('fs'),
-  Path = requireUncached('path'),
-  H = requireUncached('../H');
+  FS = require('fs'),
+  Path = require('path'),
+  H = require('../H');
 class CompilerJS{
   static RegexAppend:RegExp = /@(codekit-append|prepros-append|compiler-append)/;
   static RegexOutput:RegExp = /@compiler-output/;
@@ -140,25 +135,25 @@ class CompilerJS{
             },
             Output = null;
           if(Opts.Compiler === 'Babel'){
-            Babel = Babel || requireUncached('babel');
+            Babel = Babel || require('babel');
             Output = Babel.transform(Result.Contents,{sourceMap:HasSourceMap});
             ToReturn.Content = Output.code;
             if(HasSourceMap){
               ToReturn.SourceMap = JSON.stringify(Output.map);
             }
           } else if(Opts.Compiler === 'ReactTools'){
-            ReactTools = ReactTools || requireUncached('react-tools');
+            ReactTools = ReactTools || require('react-tools');
             Output = ReactTools.transformWithDetails(Result.Contents,{harmony:true,stripTypes:true,sourceMap:HasSourceMap});
             ToReturn.Content = Output.code;
             if(HasSourceMap){
               ToReturn.SourceMap = JSON.stringify(Output.sourceMap);
             }
           } else if(Opts.Compiler === 'Riot'){
-            Riot = Riot || requireUncached('riot');
+            Riot = Riot || require('riot');
             ToReturn.Content = Riot.compile(Result.Contents,{compact:true});
           }
           if((!Opts.Compiler && Opts.SourceMap) || !Opts.SourceMap){
-            UglifyJS = UglifyJS || requireUncached('uglify-js');
+            UglifyJS = UglifyJS || require('uglify-js');
             Output = UglifyJS.minify(ToReturn.Content || Result.Content,{fromString: true,outSourceMap:HasSourceMap ? "js.map" : undefined});
             ToReturn.Content = Output.code;
             if(HasSourceMap){
