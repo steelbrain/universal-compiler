@@ -1,20 +1,14 @@
 
 
-function requireUncached(LeModule){
-  delete require.cache[require.resolve(LeModule)]
-  return require(LeModule)
-}
-
 var
-  Promise = requireUncached('a-promise'),
-  FS = requireUncached('fs'),
-  Path = requireUncached('path');
+  Promise = require('a-promise'),
+  FS = require('fs');
 class Compiler{
   Map:Object;
 
   constructor(){
     var
-      CompilerJS = requireUncached('./Plugins/Compiler-JS');
+      CompilerJS = require('./Plugins/Compiler-JS');
     this.Map = {
       'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel'}},
       'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel'}},
