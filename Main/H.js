@@ -20,5 +20,13 @@ class H{
       RelativePath.join(Path.sep) + Path.sep + Path2.join(Path.sep) :
       Path2.join(Path.sep);
   }
+  static Clone(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+      if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+  }
 }
 module.exports = H;
