@@ -130,8 +130,8 @@ class CompilerLESS{
               ToReturn.SourceMap = LeResult.map;
             }
             if(!Opts.SourceMap){
-              UglifyCSS = UglifyCSS || require('uglifycss');
-              ToReturn.Content = UglifyCSS.processString(ToReturn.Content);
+              UglifyCSS = UglifyCSS || new(require('clean-css'))({sourceMap:true});
+              ToReturn.Content = UglifyCSS.minify(ToReturn.Content).styles;
             }
             if(HasSourceMap){
               ToReturn.Content += '/*# sourceMappingURL='+H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap)+' */';

@@ -18,7 +18,7 @@
     "a-promise": "latest",
     "coffee-script": "latest",
     "less": "latest",
-    "uglifycss": "latest"
+    "clean-css": "latest"
   },
   "keywords": [
     "compiler",
