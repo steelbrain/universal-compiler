@@ -40,15 +40,22 @@ class CompilerCoffee{
     });
   }
 
-  static ParseAppend(Line:String, FileDir: String, FilePath:String):Promise{
+  static ParseAppend(Line:String, FileDir: String, FilePath:String, HasSourceMap:Boolean):Promise{
     return new Promise(function(resolve,reject){
       CompilerCoffee.ExtractPath(Line, FileDir).then(function(Result){
-        FS.readFile(Result, function (Error, LeContent) {
-          if (Error) {
-            return reject(`The File '${Result} doesn't exist, It was imported in ${FilePath}'`);
-          }
-          resolve(LeContent.toString());
-        });
+        if(!HasSourceMap){
+          // Lets append it if we aren't giving em any source maps, EH!
+          Compiler.Compile(Result).then(function(Result){
+            resolve(Result.Content);
+          },reject)
+        } else {
+          FS.readFile(Result, function (Error, LeContent) {
+            if (Error) {
+              return reject(`The File '${Result} doesn't exist, It was imported in ${FilePath}'`);
+            }
+            resolve(LeContent.toString());
+          });
+        }
       },reject);
     });
   }
@@ -68,7 +75,7 @@ class CompilerCoffee{
               return LineResolve(); // Ignore non-commented lines or lines with stuff + comments
             }
             if(CompilerCoffee.RegexAppend.test(Line)) {
-              CompilerCoffee.ParseAppend(Line, FileDir,FilePath).then(function(Result){
+              CompilerCoffee.ParseAppend(Line, FileDir,FilePath, !!Opts.SourceMap).then(function(Result){
                 Content[LeIndex] = Result;
                 LineResolve();
               },LineReject);
