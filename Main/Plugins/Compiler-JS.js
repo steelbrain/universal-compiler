@@ -38,7 +38,7 @@ class CompilerJS{
     });
   }
 
-  static ParseAppend(Line:String, FileDir: String):Promise{
+  static ParseAppend(Line:String, FileDir: String, FilePath:String):Promise{
     return new Promise(function(resolve,reject){
       CompilerJS.ExtractPath(Line, FileDir).then(function(Result){
         FS.readFile(Result, function (Error, LeContents) {
@@ -84,7 +84,7 @@ class CompilerJS{
               return LineResolve(); // Ignore non-commented lines or lines with stuff + comments
             }
             if(CompilerJS.RegexAppend.test(Line)) {
-              CompilerJS.ParseAppend(Line, FileDir).then(function(Result){
+              CompilerJS.ParseAppend(Line, FileDir,FilePath).then(function(Result){
                 Contents[LeIndex] = Result;
                 LineResolve();
               },LineReject);
