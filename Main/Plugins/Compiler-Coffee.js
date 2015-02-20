@@ -3,7 +3,7 @@
 // @Compiler-Output "../../Build/Plugins/Compiler-Coffee.js"
 var
   Promise = require('a-promise'),
-  UglifyJS = require('uglify-js'),
+  UglifyJS = null,
   CoffeeScript = null,
   FS = require('fs'),
   Path = require('path'),
@@ -135,7 +135,7 @@ class CompilerCoffee{
           }
           if((!Opts.SourceMap) && ToReturn.Content.substr(0,2) !== '#!'){
             UglifyJS = UglifyJS || require('uglify-js');
-            Output = UglifyJS.minify(ToReturn.Content || Result.Content,{fromString: true,outSourceMap:HasSourceMap ? "js.map" : undefined});
+            Output = UglifyJS.minify(ToReturn.Content,{fromString: true,outSourceMap:HasSourceMap ? "js.map" : undefined});
             ToReturn.Content = Output.code;
             if(HasSourceMap){
               ToReturn.SourceMap = Output.map;
