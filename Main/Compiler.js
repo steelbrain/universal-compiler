@@ -11,13 +11,17 @@ class Compiler{
   constructor(){
     var
       CompilerJS = require('./Plugins/Compiler-JS'),
-      CompilerCoffee = require('./Plugins/Compiler-Coffee');
+      CompilerCoffee = require('./Plugins/Compiler-Coffee'),
+      CompilerLESS = require('./Plugins/Compiler-LESS');
     CompilerJS.init(this);
+    CompilerCoffee.init(this);
+    CompilerLESS.init(this);
     this.Map = {
       'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel'}},
       'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel'}},
       'TAG': {Compiler: CompilerJS, Opts:{Compiler:'Riot'}},
-      'COFFEE': {Compiler: CompilerCoffee, Opts:{}}
+      'COFFEE': {Compiler: CompilerCoffee, Opts:{}},
+      'LESS': {Compiler: CompilerLESS,Opts:{}}
     };
   }
   Compile(SourceFile:String, TargetFile:String, SourceMap:String):Promise{
