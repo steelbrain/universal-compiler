@@ -47,7 +47,7 @@ class Compiler{
               resolve();
             }
           })
-        }).catch(reject);
+        },reject);
 
       }.bind(this));
     }.bind(this));
