@@ -5,7 +5,7 @@
 
 
 var Compiler = require("./Compiler");
-if (!process.argv[2]) {
+if (!process.argv[2] || process.argv[2].indexOf('node_modules') !== -1) {
   console.log("Please Specify a source File");
   process.exit(1);
 }
