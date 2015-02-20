@@ -7,12 +7,17 @@ var
   CoffeeScript = null,
   FS = require('fs'),
   Path = require('path'),
-  H = require('../H');
+  H = require('../H'),
+  Compiler = null;
 class CompilerCoffee{
   static RegexAppend:RegExp = /@(codekit-append|prepros-append|Compiler-Append)/;
   static RegexOutput:RegExp = /@Compiler-Output/;
   static RegexSourceMap:RegExp = /@Compiler-Sourcemap/;
   static RegexExtract:RegExp = /".*"/;
+  static init(LeCompiler):void{
+    Compiler = LeCompiler;
+  }
+
   static ExtractValue(Line:String):Promise{
     return new Promise(function(resolve,reject){
       var Result = CompilerCoffee.RegexExtract.exec(Line);

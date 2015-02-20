@@ -9,13 +9,18 @@ var
   ReactTools = null,
   FS = require('fs'),
   Path = require('path'),
-  H = require('../H');
+  H = require('../H'),
+  Compiler = null;
 class CompilerJS{
   static RegexAppend:RegExp = /@(codekit-append|prepros-append|Compiler-Append)/;
   static RegexOutput:RegExp = /@Compiler-Output/;
   static RegexCompiler:RegExp = /@Compiler-Name/;
   static RegexSourceMap:RegExp = /@Compiler-Sourcemap/;
   static RegexExtract:RegExp = /".*"/;
+  static init(LeCompiler):void{
+    Compiler = LeCompiler;
+  }
+
   static ExtractValue(Line:String):Promise{
     return new Promise(function(resolve,reject){
       var Result = CompilerJS.RegexExtract.exec(Line);
@@ -41,12 +46,19 @@ class CompilerJS{
   static ParseAppend(Line:String, FileDir: String, FilePath:String):Promise{
     return new Promise(function(resolve,reject){
       CompilerJS.ExtractPath(Line, FileDir).then(function(Result){
-        FS.readFile(Result, function (Error, LeContent) {
-          if (Error) {
-            return reject(`The File '${Result} doesn't exist, It was imported in ${FilePath}'`);
-          }
-          resolve(LeContent.toString());
-        });
+        if(!Opts.SourceMap){
+          // Lets append it if we aren't giving em any source maps, EH!
+          Compiler.Compile(Result).then(function(Result){
+            resolve('(function(){'+Result.Content+'})();');
+          },reject)
+        } else {
+          FS.readFile(Result, function (Error, LeContent) {
+            if (Error) {
+              return reject(`The File '${Result} doesn't exist, It was imported in ${FilePath}'`);
+            }
+            resolve(LeContent.toString());
+          });
+        }
       },reject);
     });
   }

@@ -11,6 +11,7 @@ class Compiler{
     var
       CompilerJS = require('./Plugins/Compiler-JS'),
       CompilerCoffee = require('./Plugins/Compiler-Coffee');
+    CompilerJS.init(this);
     this.Map = {
       'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel'}},
       'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel'}},
