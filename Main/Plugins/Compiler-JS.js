@@ -41,11 +41,11 @@ class CompilerJS{
   static ParseAppend(Line:String, FileDir: String, FilePath:String):Promise{
     return new Promise(function(resolve,reject){
       CompilerJS.ExtractPath(Line, FileDir).then(function(Result){
-        FS.readFile(Result, function (Error, LeContents) {
+        FS.readFile(Result, function (Error, LeContent) {
           if (Error) {
             return reject(`The File '${Result} doesn't exist, It was imported in ${FilePath}'`);
           }
-          resolve(LeContents.toString());
+          resolve(LeContent.toString());
         });
       },reject);
     });
@@ -68,13 +68,13 @@ class CompilerJS{
       }, reject);
     });
   }
-  static Parse(FilePath:String, Contents:Array, Opts:Object):Promise{
+  static Parse(FilePath:String, Content:Array, Opts:Object):Promise{
     return new Promise(function(resolve,reject){
       var
-        ToReturn = {Contents: "", Opts: Opts},
+        ToReturn = {Content: "", Opts: Opts},
         FileDir = Path.dirname(FilePath),
         Promises = [];
-      Contents.forEach(function(Line:String, LeIndex:Number){
+      Content.forEach(function(Line:String, LeIndex:Number){
         var Index;
         if(Line.indexOf('//') !== -1){
           Promises.push(new Promise(function(LineResolve,LineReject){
@@ -85,7 +85,7 @@ class CompilerJS{
             }
             if(CompilerJS.RegexAppend.test(Line)) {
               CompilerJS.ParseAppend(Line, FileDir,FilePath).then(function(Result){
-                Contents[LeIndex] = Result;
+                Content[LeIndex] = Result;
                 LineResolve();
               },LineReject);
             } else if(CompilerJS.RegexOutput.test(Line)) {
@@ -114,18 +114,18 @@ class CompilerJS{
         }
       });
       Promise.all(Promises).then(function(){
-        ToReturn.Contents = Contents.join("\n");
+        ToReturn.Content = Content.join("\n");
         resolve(ToReturn);
       },reject);
     });
   }
   static Process(FilePath:String, Opts:Object):Promise{
     return new Promise(function(resolve,reject){
-      FS.readFile(FilePath,function(Error,Contents){
+      FS.readFile(FilePath,function(Error,Content){
         if(Error){
           return reject(Error);
         }
-        CompilerJS.Parse(FilePath,Contents.toString().split("\n"),Opts).then(function(Result){
+        CompilerJS.Parse(FilePath,Content.toString().split("\n"),Opts).then(function(Result){
           Opts = Result.Opts;
           var
             HasSourceMap = Opts.SourceMap !== null,
@@ -137,21 +137,21 @@ class CompilerJS{
             Output = null;
           if(Opts.Compiler === 'Babel'){
             Babel = Babel || require('babel');
-            Output = Babel.transform(Result.Contents,{sourceMap:HasSourceMap, playground:true, experimental:true});
+            Output = Babel.transform(Result.Content,{sourceMap:HasSourceMap, playground:true, experimental:true});
             ToReturn.Content = Output.code;
             if(HasSourceMap){
               ToReturn.SourceMap = JSON.stringify(Output.map);
             }
           } else if(Opts.Compiler === 'ReactTools'){
             ReactTools = ReactTools || require('react-tools');
-            Output = ReactTools.transformWithDetails(Result.Contents,{harmony:true,stripTypes:true,sourceMap:HasSourceMap});
+            Output = ReactTools.transformWithDetails(Result.Content,{harmony:true,stripTypes:true,sourceMap:HasSourceMap});
             ToReturn.Content = Output.code;
             if(HasSourceMap){
               ToReturn.SourceMap = JSON.stringify(Output.sourceMap);
             }
           } else if(Opts.Compiler === 'Riot'){
             Riot = Riot || require('riot');
-            ToReturn.Content = Riot.compile(Result.Contents,{compact:true});
+            ToReturn.Content = Riot.compile(Result.Content,{compact:true});
           }
           if(((!Opts.Compiler && Opts.SourceMap) || !Opts.SourceMap) && ToReturn.Content.substr(0,2) !== '#!'){
             UglifyJS = UglifyJS || require('uglify-js');

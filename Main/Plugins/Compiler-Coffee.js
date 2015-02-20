@@ -7,7 +7,7 @@ var
   CoffeeScript = null,
   FS = require('fs'),
   Path = require('path'),
-  H = require('h');
+  H = require('../H');
 class CompilerCoffee{
   static RegexAppend:RegExp = /@(codekit-append|prepros-append|Compiler-Append)/;
   static RegexOutput:RegExp = /@Compiler-Output/;
@@ -38,22 +38,22 @@ class CompilerCoffee{
   static ParseAppend(Line:String, FileDir: String, FilePath:String):Promise{
     return new Promise(function(resolve,reject){
       CompilerCoffee.ExtractPath(Line, FileDir).then(function(Result){
-        FS.readFile(Result, function (Error, LeContents) {
+        FS.readFile(Result, function (Error, LeContent) {
           if (Error) {
             return reject(`The File '${Result} doesn't exist, It was imported in ${FilePath}'`);
           }
-          resolve(LeContents.toString());
+          resolve(LeContent.toString());
         });
       },reject);
     });
   }
-  static Parse(FilePath:String, Contents:Array, Opts:Object):Promise{
+  static Parse(FilePath:String, Content:Array, Opts:Object):Promise{
     return new Promise(function(resolve,reject){
       var
-        ToReturn = {Contents: "", Opts: Opts},
+        ToReturn = {Content: "", Opts: Opts},
         FileDir = Path.dirname(FilePath),
         Promises = [];
-      Contents.forEach(function(Line:String, LeIndex:Number){
+      Content.forEach(function(Line:String, LeIndex:Number){
         var Index;
         if(Line.indexOf('#') !== -1){
           Promises.push(new Promise(function(LineResolve,LineReject){
@@ -64,7 +64,7 @@ class CompilerCoffee{
             }
             if(CompilerCoffee.RegexAppend.test(Line)) {
               CompilerCoffee.ParseAppend(Line, FileDir,FilePath).then(function(Result){
-                Contents[LeIndex] = Result;
+                Content[LeIndex] = Result;
                 LineResolve();
               },LineReject);
             } else if(CompilerCoffee.RegexOutput.test(Line)) {
@@ -88,18 +88,18 @@ class CompilerCoffee{
         }
       });
       Promise.all(Promises).then(function(){
-        ToReturn.Contents = Contents.join("\n");
+        ToReturn.Content = Content.join("\n");
         resolve(ToReturn);
       },reject);
     });
   }
   static Process(FilePath:String, Opts:Object):Promise{
     return new Promise(function(resolve,reject){
-      FS.readFile(FilePath,function(Error,Contents){
+      FS.readFile(FilePath,function(Error,Content){
         if(Error){
           return reject(Error);
         }
-        CompilerCoffee.Parse(FilePath,Contents.toString().split("\n"),Opts).then(function(Result){
+        CompilerCoffee.Parse(FilePath,Content.toString().split("\n"),Opts).then(function(Result){
           Opts = Result.Opts;
           var
             HasSourceMap = Opts.SourceMap !== null,
@@ -110,7 +110,11 @@ class CompilerCoffee{
             },
             Output = null;
           CoffeeScript = CoffeeScript || require('coffee-script');
-          Output = CoffeeScript.compile(ToReturn.Content,{sourceMap:true});
+          try {
+            Output = CoffeeScript.compile(Result.Content,{sourceMap:true});
+          } catch(error){
+            reject(error);
+          }
           ToReturn.Content = Output.js;
           if(HasSourceMap){
             ToReturn.SourceMap = JSON.stringify(Output.v3SourceMap);
