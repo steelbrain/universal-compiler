@@ -43,10 +43,10 @@ class CompilerJS{
     });
   }
 
-  static ParseAppend(Line:String, FileDir: String, FilePath:String):Promise{
+  static ParseAppend(Line:String, FileDir: String, FilePath:String,HasSourceMap:Boolean):Promise{
     return new Promise(function(resolve,reject){
       CompilerJS.ExtractPath(Line, FileDir).then(function(Result){
-        if(!Opts.SourceMap){
+        if(!HasSourceMap){
           // Lets append it if we aren't giving em any source maps, EH!
           Compiler.Compile(Result).then(function(Result){
             resolve('(function(){'+Result.Content+'})();');
@@ -96,18 +96,20 @@ class CompilerJS{
               return LineResolve(); // Ignore non-commented lines or lines with stuff + comments
             }
             if(CompilerJS.RegexAppend.test(Line)) {
-              CompilerJS.ParseAppend(Line, FileDir,FilePath).then(function(Result){
+              CompilerJS.ParseAppend(Line, FileDir,FilePath,!!Opts.SourceMap).then(function(Result){
                 Content[LeIndex] = Result;
                 LineResolve();
               },LineReject);
             } else if(CompilerJS.RegexOutput.test(Line)) {
               CompilerJS.ExtractPath(Line, FileDir).then(function(Result) {
                 Opts.TargetFile = Result;
+                Content[LeIndex] = '';
                 LineResolve();
               }, LineReject);
             } else if(CompilerJS.RegexCompiler.test(Line)) {
               CompilerJS.ParseCompiler(Line).then(function(Compiler){
                 Opts.Compiler = Compiler;
+                Content[LeIndex] = '';
                 LineResolve();
               },LineReject);
             } else if(CompilerJS.RegexSourceMap.test(Line)) {
@@ -117,6 +119,7 @@ class CompilerJS{
                 } else {
                   Opts.SourceMap = Result;
                 }
+                Content[LeIndex] = '';
                 LineResolve();
               });
             } else {

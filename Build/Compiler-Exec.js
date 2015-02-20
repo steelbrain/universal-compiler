@@ -1,8 +1,7 @@
 #!/usr/bin/env nodejs
-
 "use strict";
 
-// @Compiler-Output "../Build/Compiler-Exec.js"
+
 
 
 var Compiler = require("./Compiler");

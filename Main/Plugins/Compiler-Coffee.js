@@ -75,10 +75,12 @@ class CompilerCoffee{
             } else if(CompilerCoffee.RegexOutput.test(Line)) {
               CompilerCoffee.ExtractPath(Line, FileDir).then(function(Result) {
                 Opts.TargetFile = Result;
+                Content[LeIndex] = '';
                 LineResolve();
               }, LineReject);
             } else if(CompilerCoffee.RegexSourceMap.test(Line)) {
               CompilerCoffee.ExtractPath(Line, FileDir).then(function(Result){
+                Content[LeIndex] = '';
                 if(Result === ''){
                   Opts.SourceMap = null;
                 } else {
