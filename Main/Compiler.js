@@ -3,7 +3,8 @@
 // @Compiler-Output "../Build/Compiler.js"
 var
   Promise = require('a-promise'),
-  FS = require('fs');
+  FS = require('fs'),
+  H = require('./H');
 class Compiler{
   Map:Object;
 
@@ -29,7 +30,7 @@ class Compiler{
 
         var
           Extension = SourceFile.split('.').pop().toUpperCase(),
-          Opts = this.Map[Extension].Opts;
+          Opts = H.Clone(this.Map[Extension].Opts);
         Opts.TargetFile = TargetFile || null;
         Opts.SourceMap = SourceMap || null;
         if(!this.Map.hasOwnProperty(Extension)){
