@@ -110,10 +110,10 @@ class CompilerCoffee{
             },
             Output = null;
           CoffeeScript = CoffeeScript || require('coffee-script');
-          Output = Babel.transform(Result.Contents,{sourceMap:HasSourceMap, playground:true, experimental:true});
-          ToReturn.Content = Output.code;
+          Output = CoffeeScript.compile(ToReturn.Content,{sourceMap:true});
+          ToReturn.Content = Output.js;
           if(HasSourceMap){
-            ToReturn.SourceMap = JSON.stringify(Output.map);
+            ToReturn.SourceMap = JSON.stringify(Output.v3SourceMap);
           }
           if((!Opts.SourceMap) && ToReturn.Content.substr(0,2) !== '#!'){
             UglifyJS = UglifyJS || require('uglify-js');
