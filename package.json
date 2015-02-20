@@ -15,7 +15,8 @@
     "babel": "latest",
     "react-tools": "latest",
     "riot": "latest",
-    "a-promise": "latest"
+    "a-promise": "latest",
+    "coffee-script": "latest"
   },
   "keywords": [
     "compiler",
