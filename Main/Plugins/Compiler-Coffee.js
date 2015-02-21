@@ -131,7 +131,7 @@ class CompilerCoffee{
           }
           ToReturn.Content = Output.js;
           if(HasSourceMap){
-            ToReturn.SourceMap = JSON.stringify(Output.v3SourceMap);
+            ToReturn.SourceMap = (Output.v3SourceMap);
           }
           if((!Opts.SourceMap) && ToReturn.Content.substr(0,2) !== '#!'){
             UglifyJS = UglifyJS || require('uglify-js');
