@@ -19,10 +19,10 @@ class Compiler{
     CompilerLESS.init(this);
     CompilerCSS.init(this);
     this.Map = {
-      'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel'}},
-      'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel'}},
-      'TAG': {Compiler: CompilerJS, Opts:{Compiler:'Riot'}},
-      'COFFEE': {Compiler: CompilerCoffee, Opts:{}},
+      'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null}},
+      'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null}},
+      'TAG': {Compiler: CompilerJS, Opts:{Compiler:'Riot', Shebang: null}},
+      'COFFEE': {Compiler: CompilerCoffee, Opts:{Shebang: null}},
       'LESS': {Compiler: CompilerLESS, Opts:{}},
       'CSS': {Compiler: CompilerCSS, Opts:{}}
     };

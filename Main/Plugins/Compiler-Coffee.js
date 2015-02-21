@@ -65,6 +65,13 @@ class CompilerCoffee{
         ToReturn = {Content: "", Opts: Opts},
         FileDir = Path.dirname(FilePath),
         Promises = [];
+      if(Content.length){
+        if(Content[0].substr(0,2) === '#!'){
+          // Shebang
+          Opts.Shebang = Content[0];
+          Content[0] = '';
+        }
+      }
       Content.forEach(function(Line:String, LeIndex:Number){
         var Index;
         if(Line.indexOf('#') !== -1){
@@ -133,16 +140,17 @@ class CompilerCoffee{
           if(HasSourceMap){
             ToReturn.SourceMap = (Output.v3SourceMap);
           }
-          if((!Opts.SourceMap) && ToReturn.Content.substr(0,2) !== '#!'){
+          if(!Opts.SourceMap){
             UglifyJS = UglifyJS || require('uglify-js');
             Output = UglifyJS.minify(ToReturn.Content,{fromString: true,outSourceMap:HasSourceMap ? "js.map" : undefined});
             ToReturn.Content = Output.code;
-            if(HasSourceMap){
-              ToReturn.SourceMap = Output.map;
-            }
           }
-          if(HasSourceMap){
-            ToReturn.Content += '//# sourceMappingURL='+H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap);
+          if(HasSourceMap && Opts.Shebang === null){
+            ToReturn.Content += '//# sourceMappingURL=' + H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap);
+          }
+          if(Opts.Shebang){
+            ToReturn.SourceMap = ''; // Not sure if sourcemap works after you append a line, so disabling
+            ToReturn.Content = Opts.Shebang + "\n" + ToReturn.Content;
           }
           resolve(ToReturn);
         },reject);
