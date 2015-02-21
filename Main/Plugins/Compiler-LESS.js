@@ -3,7 +3,6 @@
 // @Compiler-Output "../../Build/Plugins/Compiler-LESS.js"
 var
   Promise = require('a-promise'),
-  UglifyCSS = null,
   LESS = null,
   FS = require('fs'),
   Path = require('path'),
@@ -122,19 +121,27 @@ class CompilerLESS{
               SourceMap: '',
               Opts: Opts
             },
-            Output = null;
+            SourceMapURL = HasSourceMap ? H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap) : null,
+            FileDir = Path.dirname(FilePath),
+            Temp = null;
           LESS = LESS || require('less');
-          LESS.render(Result.Content,{sourceMap:true}).then(function(LeResult){
+          LESS.render(Result.Content,{
+            sourceMap: true,
+            filename: FilePath,
+            paths: [FileDir],
+            compress: !HasSourceMap
+          }).then(function(LeResult){
             ToReturn.Content = LeResult.css;
             if(HasSourceMap){
-              ToReturn.SourceMap = LeResult.map;
-            }
-            if(!Opts.SourceMap){
-              UglifyCSS = UglifyCSS || new(require('clean-css'))({sourceMap:true});
-              ToReturn.Content = UglifyCSS.minify(ToReturn.Content).styles;
-            }
-            if(HasSourceMap){
-              ToReturn.Content += '/*# sourceMappingURL='+H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap)+' */';
+              Temp = {Map: JSON.parse(LeResult.map),Files:[], SourceMapDir: Opts.SourceMap.split(Path.sep)};
+              Temp.SourceMapDir.pop();
+              Temp.SourceMapDir = Temp.SourceMapDir.join(Path.sep);
+              Temp.Map.sources.forEach(function(File){
+                Temp.Files.push(H.Relative(Temp.SourceMapDir,File));
+              });
+              Temp.Map.sources = Temp.Files;
+              ToReturn.SourceMap = JSON.stringify(Temp.Map);
+              ToReturn.Content += '/*# sourceMappingURL=' + SourceMapURL + ' */';
             }
             resolve(ToReturn);
           },reject);
