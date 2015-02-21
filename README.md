@@ -11,6 +11,7 @@ npm install universal-compiler
  - LESS
  - CoffeeScript
  - Javascript (ES6 & Minification)
+
 #### Usage
 ```
 cd universal-compiler/Build/
@@ -34,7 +35,7 @@ If the target isn't provided as a CLI argument the compiler will output the comp
 What's my favorite thing about this compiler is that you can actually control the options from the files themselves.
 
 ```js
-1.js =======
+// Note: I am 1.js
 // @Compiler-Output "2.js"
 // @Compiler-Sourcemap "2.map"
 window.a = function(){
