@@ -170,7 +170,11 @@ class CompilerJS{
           }
           if(((!Opts.Compiler && Opts.SourceMap) || !Opts.SourceMap) && ToReturn.Content.substr(0,2) !== '#!'){
             UglifyJS = UglifyJS || require('uglify-js');
-            Output = UglifyJS.minify(ToReturn.Content || Result.Content,{fromString: true,outSourceMap:HasSourceMap ? "js.map" : undefined});
+            try {
+              Output = UglifyJS.minify(ToReturn.Content || Result.Content,{fromString: true,outSourceMap:HasSourceMap ? "js.map" : undefined});
+            } catch(error){
+              reject(error+"\nContent Was:\n"+ToReturn.Content);
+            }
             ToReturn.Content = Output.code;
             if(HasSourceMap){
               ToReturn.SourceMap = Output.map;
