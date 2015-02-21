@@ -23,7 +23,7 @@ class Compiler{
       'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null}},
       'TAG': {Compiler: CompilerJS, Opts:{Compiler:'Riot', Shebang: null}},
       'COFFEE': {Compiler: CompilerCoffee, Opts:{Shebang: null}},
-      'LESS': {Compiler: CompilerLESS, Opts:{}},
+      'LESS': {Compiler: CompilerLESS, Opts:{Compress: false}},
       'CSS': {Compiler: CompilerCSS, Opts:{}}
     };
   }

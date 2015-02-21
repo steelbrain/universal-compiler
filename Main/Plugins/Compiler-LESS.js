@@ -12,6 +12,7 @@ class CompilerLESS{
   static RegexAppend:RegExp = /@(codekit-append|prepros-append|Compiler-Append)/;
   static RegexOutput:RegExp = /@Compiler-Output/;
   static RegexSourceMap:RegExp = /@Compiler-Sourcemap/;
+  static RegexCompress:RegExp = /@Compiler-Compress/;
   static RegexExtract:RegExp = /".*"/;
   static init(LeCompiler):void{
     Compiler = LeCompiler;
@@ -85,13 +86,19 @@ class CompilerLESS{
                 LineResolve();
               }, LineReject);
             } else if(CompilerLESS.RegexSourceMap.test(Line)) {
-              CompilerLESS.ExtractPath(Line, FileDir).then(function(Result){
+              CompilerLESS.ExtractPath(Line, FileDir).then(function (Result) {
                 Content[LeIndex] = '';
-                if(Result === ''){
+                if (Result === '') {
                   Opts.SourceMap = null;
                 } else {
                   Opts.SourceMap = Result;
                 }
+                LineResolve();
+              });
+            } else if(CompilerLESS.RegexCompress.test(Line)){
+              CompilerLESS.ExtractPath(Line, FileDir).then(function (Result) {
+                Content[LeIndex] = '';
+                Opts.Compress = Result === 'true';
                 LineResolve();
               });
             } else {
@@ -129,7 +136,7 @@ class CompilerLESS{
             sourceMap: true,
             filename: FilePath,
             paths: [FileDir],
-            compress: !HasSourceMap
+            compress: Opts.Compress
           }).then(function(LeResult){
             ToReturn.Content = LeResult.css;
             if(HasSourceMap){
