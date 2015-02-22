@@ -1,9 +1,9 @@
 #!/usr/bin/env nodejs
-// @Compiler-Output "../Built/Compiler-Exec.js"
+// @Compiler-Output "../Built-Bin/Exec.js"
 
 
 var
-  Compiler = require('./Compiler');
+  Compiler = require('./../Built/Compiler');
 if(!process.argv[2]){
   console.log("Please Specify a source File");
   process.exit(1);

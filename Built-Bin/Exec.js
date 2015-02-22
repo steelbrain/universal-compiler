@@ -4,7 +4,7 @@
 
 
 
-var Compiler = require("./Compiler");
+var Compiler = require("./../Built/Compiler");
 if (!process.argv[2]) {
   console.log("Please Specify a source File");
   process.exit(1);

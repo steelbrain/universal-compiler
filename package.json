@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "uc-compile" : "./Build/Compiler-Exec.js"
+    "uc-compile" : "./Built-Bin/Exec.js"
   },
   "repository": {
     "type": "git",
