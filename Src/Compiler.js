@@ -11,11 +11,9 @@ class Compiler{
   constructor(){
     var
       CompilerJS = new (require('./Plugins/Compiler-JS'))(this),
-      CompilerCoffee = new(require('./Plugins/Compiler-Coffee'))(this),
-      CompilerLESS = require('./Plugins/Compiler-LESS'),
-      CompilerCSS = require('./Plugins/Compiler-CSS');
-    CompilerLESS.init(this);
-    CompilerCSS.init(this);
+      CompilerCoffee = new (require('./Plugins/Compiler-Coffee'))(this),
+      CompilerLESS = new (require('./Plugins/Compiler-LESS'))(this),
+      CompilerCSS = new (require('./Plugins/Compiler-CSS'))(this);
     this.Map = {
       'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
       'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
