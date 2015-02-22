@@ -65,6 +65,9 @@ class CompilerJS extends CompilerBase{
           if(Opts.Compress){
             this.ProcessUglify(FilePath, ToReturn, Parsed);
           }
+          if(ToReturn.SourceMap){
+            ToReturn.Content += '//# sourceMappingURL=' + H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap);
+          }
           if(Opts.Shebang){
             ToReturn.Content = Opts.Shebang + "\n" + ToReturn.Content;
           }
@@ -105,6 +108,7 @@ class CompilerJS extends CompilerBase{
   ProcessUglify(FilePath, ToReturn, {Opts,Content}){
     UglifyJS = UglifyJS || require('uglify-js');
     ToReturn.Content = UglifyJS.minify(ToReturn.Content,{fromString: true}).code;
+    ToReturn.SourceMap = '';
   }
 }
 module.exports = CompilerJS;
