@@ -36,7 +36,7 @@ class CompilerCoffee extends CompilerBase{
   }
   Process(FilePath:String, Opts:Object):Promise{
     return new Promise(function(Resolve,Reject){
-      H.ReadFile(FilePath).then(function(Content){
+      H.FileRead(FilePath).then(function(Content){
         this.Parse(FilePath,Content,Opts).then(function(Parsed){
           var ToReturn = {Content: Parsed.Content, SourceMap: '', Opts: Parsed.Opts};
           try {

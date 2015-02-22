@@ -34,7 +34,7 @@ class H{
     }
     return FilePath;
   }
-  static ReadFile(Path:String):Promise{
+  static FileRead(Path:String):Promise{
     return new Promise(function(Resolve,Reject){
       FS.readFile(Path,function(Error,Content){
         if(Error){
