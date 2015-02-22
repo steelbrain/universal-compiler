@@ -13,6 +13,7 @@ class CompilerCoffee{
   static RegexAppend:RegExp = /@(codekit-append|prepros-append|Compiler-Append)/;
   static RegexOutput:RegExp = /@Compiler-Output/;
   static RegexSourceMap:RegExp = /@Compiler-Sourcemap/;
+  static RegexCompress:RegExp = /@Compiler-Compress/;
   static RegexExtract:RegExp = /".*"/;
   static init(LeCompiler):void{
     Compiler = LeCompiler;
@@ -102,6 +103,12 @@ class CompilerCoffee{
                 }
                 LineResolve();
               });
+            } else if(CompilerCoffee.RegexCompress.test(Line)){
+              CompilerCoffee.ExtractValue(Line).then(function (Result) {
+                Content[LeIndex] = '';
+                Opts.Compress = Result === 'true';
+                LineResolve();
+              });
             } else {
               LineResolve();
             }
@@ -129,27 +136,31 @@ class CompilerCoffee{
               SourceMap: '',
               Opts: Opts
             },
-            Output = null;
+            Output = null,
+            PathName = null;
           CoffeeScript = CoffeeScript || require('coffee-script');
           try {
-            Output = CoffeeScript.compile(Result.Content,{sourceMap:true});
+            Output = CoffeeScript.compile(Result.Content,{
+              sourceMap: true,
+              sourceFiles: [Path.basename(FilePath)],
+              generatedFile: Path.basename(Opts.TargetFile),
+              inline: true
+            });
           } catch(error){
             reject(error);
           }
           ToReturn.Content = Output.js;
           if(HasSourceMap){
             ToReturn.SourceMap = (Output.v3SourceMap);
-          }
-          if(!Opts.SourceMap){
-            UglifyJS = UglifyJS || require('uglify-js');
-            Output = UglifyJS.minify(ToReturn.Content,{fromString: true,outSourceMap:HasSourceMap ? "js.map" : undefined});
-            ToReturn.Content = Output.code;
-          }
-          if(HasSourceMap && Opts.Shebang === null){
             ToReturn.Content += '//# sourceMappingURL=' + H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap);
           }
+          if(Opts.Compress){
+            UglifyJS = UglifyJS || require('uglify-js');
+            Output = UglifyJS.minify(ToReturn.Content,{fromString: true});
+            ToReturn.Content = Output.code;
+            ToReturn.Sourcemap = '';
+          }
           if(Opts.Shebang){
-            ToReturn.SourceMap = ''; // Not sure if sourcemap works after you append a line, so disabling
             ToReturn.Content = Opts.Shebang + "\n" + ToReturn.Content;
           }
           resolve(ToReturn);
