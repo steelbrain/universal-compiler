@@ -10,12 +10,10 @@ class Compiler{
 
   constructor(){
     var
-      CompilerJS = require('./Plugins/Compiler-JS'),
-      CompilerCoffee = require('./Plugins/Compiler-Coffee'),
+      CompilerJS = new (require('./Plugins/Compiler-JS'))(this),
+      CompilerCoffee = new(require('./Plugins/Compiler-Coffee'))(this),
       CompilerLESS = require('./Plugins/Compiler-LESS'),
       CompilerCSS = require('./Plugins/Compiler-CSS');
-    CompilerJS.init(this);
-    CompilerCoffee.init(this);
     CompilerLESS.init(this);
     CompilerCSS.init(this);
     this.Map = {
