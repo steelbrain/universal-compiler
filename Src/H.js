@@ -25,5 +25,12 @@ class H{
     }
     return copy;
   }
+  static ABSPath(FilePath:String, FileDir:String):String{
+    if (FilePath.substr(0, 1) !== Path.sep &&
+      FilePath.substr(1, 1) !== ':') { // Windows Drive `D:\`
+      FilePath = FileDir + Path.sep + FilePath;
+    }
+    return FilePath;
+  }
 }
 module.exports = H;
