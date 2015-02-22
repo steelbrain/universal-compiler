@@ -3,7 +3,7 @@
 
 
 var
-  Compiler = require('./../Built/Compiler');
+  Compiler = require('./../Src/Compiler');
 if(!process.argv[2]){
   console.log("Please Specify a source File");
   process.exit(1);
