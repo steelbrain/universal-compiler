@@ -1,7 +1,9 @@
 
 
 // @Compiler-Output "../Built/H.js"
-var Path = require('path');
+var
+  Path = require('path'),
+  FS = require('fs');
 class H{
   static Relative(Path1:String, Path2:String):String{
     Path1 = Path1.split(Path.sep);
@@ -31,6 +33,17 @@ class H{
       FilePath = FileDir + Path.sep + FilePath;
     }
     return FilePath;
+  }
+  static ReadFile(Path:String):Promise{
+    return new Promise(function(Resolve,Reject){
+      FS.readFile(Path,function(Error,Content){
+        if(Error){
+          Reject(Error);
+        } else {
+          Resolve(Content.toString());
+        }
+      });
+    });
   }
 }
 module.exports = H;
