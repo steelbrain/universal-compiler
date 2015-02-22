@@ -20,7 +20,7 @@ class Compiler{
       'TAG': {Compiler: CompilerJS, Opts:{Compiler:'Riot', Shebang: null, Compress:false}},
       'COFFEE': {Compiler: CompilerCoffee, Opts:{Shebang: null, Compress: false}},
       'LESS': {Compiler: CompilerLESS, Opts:{Compress: false}},
-      'CSS': {Compiler: CompilerCSS, Opts:{}}
+      'CSS': {Compiler: CompilerCSS, Opts:{Compress: false}}
     };
   }
   Compile(SourceFile:String, TargetFile:String, SourceMap:String):Promise{
