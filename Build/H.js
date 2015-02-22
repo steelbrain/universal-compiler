@@ -1,1 +1,50 @@
-"use strict";var _prototypeProperties=function(e,t,n){t&&Object.defineProperties(e,t),n&&Object.defineProperties(e.prototype,n)},_classCallCheck=function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")},Path=require("path"),H=function(){function e(){_classCallCheck(this,e)}return _prototypeProperties(e,{Relative:{value:function(e,t){if(e=e.split(Path.sep),t=t.split(Path.sep),e.slice(0,e.length-1).join(Path.sep)===t.slice(0,t.length-1).join(Path.sep))return e.slice(0,e.length-1).join(Path.sep);for(var n=[],r=null;e.length&&t.length&&e[0]===t[0];)e.splice(e[0],1),t.splice(t[0],1);for(r=0;r<e.length;++r)n.push("..");return n.length?n.join(Path.sep)+Path.sep+t.join(Path.sep):t.join(Path.sep)},writable:!0,configurable:!0},Clone:{value:function(e){if(null==e||"object"!=typeof e)return e;var t=e.constructor();for(var n in e)e.hasOwnProperty(n)&&(t[n]=e[n]);return t},writable:!0,configurable:!0}}),e}();module.exports=H;
+"use strict";
+
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+
+
+var Path = require("path");
+var H = (function () {
+  function H() {
+    _classCallCheck(this, H);
+  }
+
+  _prototypeProperties(H, {
+    Relative: {
+      value: function (Path1, Path2) {
+        Path1 = Path1.split(Path.sep);
+        Path2 = Path2.split(Path.sep);
+
+        var RelativePath = [],
+            I = null;
+        while (Path1.length && Path2.length && Path1[0] === Path2[0]) {
+          Path1.splice(Path1[0], 1);
+          Path2.splice(Path2[0], 1);
+        }
+        for (I = 0; I < Path1.length; ++I) RelativePath.push("..");
+        return RelativePath.length ? RelativePath.join(Path.sep) + Path.sep + Path2.join(Path.sep) : Path2.join(Path.sep);
+      },
+      writable: true,
+      configurable: true
+    },
+    Clone: {
+      value: function (obj) {
+        if (null == obj || "object" != typeof obj) return obj;
+        var copy = obj.constructor();
+        for (var attr in obj) {
+          if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+        }
+        return copy;
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return H;
+})();
+
+module.exports = H;

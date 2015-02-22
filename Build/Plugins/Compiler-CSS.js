@@ -1,1 +1,171 @@
-"use strict";var _prototypeProperties=function(e,t,n){t&&Object.defineProperties(e,t),n&&Object.defineProperties(e.prototype,n)},_classCallCheck=function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")},Promise=require("a-promise"),UglifyCSS=null,FS=require("fs"),Path=require("path"),H=require("../H"),Compiler=null,CompilerCSS=function(){function e(){_classCallCheck(this,e)}return e.RegexAppend=/@(codekit-append|prepros-append|Compiler-Append)/,e.RegexOutput=/@Compiler-Output/,e.RegexSourceMap=/@Compiler-Sourcemap/,e.RegexExtract=/".*"/,_prototypeProperties(e,{init:{value:function(e){Compiler=e},writable:!0,configurable:!0},ExtractValue:{value:function(t){return new Promise(function(n,r){var i=e.RegexExtract.exec(t);return i.length?(i=i[0].substr(1,i[0].length-2),void n(i)):r()})},writable:!0,configurable:!0},ExtractPath:{value:function(t,n){return new Promise(function(r,i){e.ExtractValue(t).then(function(e){e.substr(0,1)!==Path.sep&&":"!==e.substr(1,1)&&(e=n+Path.sep+e),r(e)},i)})},writable:!0,configurable:!0},ParseAppend:{value:function(t,n,r,i){return new Promise(function(o,u){e.ExtractPath(t,n).then(function(e){i?FS.readFile(e,function(t,n){return t?u("The File '"+e+" doesn't exist, It was imported in "+r+"'"):void o(n.toString())}):Compiler.Compile(e).then(function(e){o(e.Content)},u)},u)})},writable:!0,configurable:!0},Parse:{value:function(t,n,r){return new Promise(function(i,o){var u={Content:"",Opts:r},a=Path.dirname(t),c=[];n.forEach(function(i,o){var u;-1!==i.indexOf("/*")&&c.push(new Promise(function(c,l){return i=i.trim(),u=i.indexOf("/*"),-1===u||0!==u?c():void(e.RegexAppend.test(i)?e.ParseAppend(i,a,t,!!r.SourceMap).then(function(e){n[o]=e,c()},l):e.RegexOutput.test(i)?e.ExtractPath(i,a).then(function(e){r.TargetFile=e,n[o]="",c()},l):e.RegexSourceMap.test(i)?e.ExtractPath(i,a).then(function(e){n[o]="",r.SourceMap=""===e?null:e,c()}):c())}))}),Promise.all(c).then(function(){u.Content=n.join("\n"),i(u)},o)})},writable:!0,configurable:!0},Process:{value:function(t,n){return new Promise(function(r,i){FS.readFile(t,function(o,u){return o?i(o):void e.Parse(t,u.toString().split("\n"),n).then(function(e){n=e.Opts;var t=null!==n.SourceMap,i={Content:"",SourceMap:"",Opts:n},o=null;UglifyCSS=UglifyCSS||new(require("clean-css"))({sourceMap:!0}),o=UglifyCSS.minify(e.Content),i.Content=o.styles,t&&(i.SourceMap=o.sourceMap,i.Content+="/*# sourceMappingURL="+H.Relative(Path.dirname(n.TargetFile),n.SourceMap)+" */"),r(i)},i)})})},writable:!0,configurable:!0}}),e}();module.exports=CompilerCSS;
+"use strict";
+
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+
+
+var Promise = require("a-promise"),
+    UglifyCSS = null,
+    FS = require("fs"),
+    Path = require("path"),
+    H = require("../H"),
+    Compiler = null;
+var CompilerCSS = (function () {
+  function CompilerCSS() {
+    _classCallCheck(this, CompilerCSS);
+  }
+
+  CompilerCSS.RegexAppend = /@(codekit-append|prepros-append|Compiler-Append)/;
+  CompilerCSS.RegexOutput = /@Compiler-Output/;
+  CompilerCSS.RegexSourceMap = /@Compiler-Sourcemap/;
+  CompilerCSS.RegexExtract = /".*"/;
+  _prototypeProperties(CompilerCSS, {
+    init: {
+      value: function (LeCompiler) {
+        Compiler = LeCompiler;
+      },
+      writable: true,
+      configurable: true
+    },
+    ExtractValue: {
+      value: function (Line) {
+        return new Promise(function (resolve, reject) {
+          var Result = CompilerCSS.RegexExtract.exec(Line);
+          if (!Result.length) {
+            return reject(); // Skip empty "@codekit-append"
+          }
+          Result = Result[0].substr(1, Result[0].length - 2);
+          resolve(Result);
+        });
+      },
+      writable: true,
+      configurable: true
+    },
+    ExtractPath: {
+      value: function (Line, FileDir) {
+        return new Promise(function (resolve, reject) {
+          CompilerCSS.ExtractValue(Line).then(function (Result) {
+            if (Result.substr(0, 1) !== Path.sep && Result.substr(1, 1) !== ":") {
+              // Windows Drive `D:\`
+              Result = FileDir + Path.sep + Result;
+            }
+            resolve(Result);
+          }, reject);
+        });
+      },
+      writable: true,
+      configurable: true
+    },
+    ParseAppend: {
+      value: function (Line, FileDir, FilePath, HasSourceMap) {
+        return new Promise(function (resolve, reject) {
+          CompilerCSS.ExtractPath(Line, FileDir).then(function (Result) {
+            if (!HasSourceMap) {
+              // Lets append it if we aren't giving em any source maps, EH!
+              Compiler.Compile(Result).then(function (Result) {
+                resolve(Result.Content);
+              }, reject);
+            } else {
+              FS.readFile(Result, function (Error, LeContent) {
+                if (Error) {
+                  return reject("The File '" + Result + " doesn't exist, It was imported in " + FilePath + "'");
+                }
+                resolve(LeContent.toString());
+              });
+            }
+          }, reject);
+        });
+      },
+      writable: true,
+      configurable: true
+    },
+    Parse: {
+      value: function (FilePath, Content, Opts) {
+        return new Promise(function (resolve, reject) {
+          var ToReturn = { Content: "", Opts: Opts },
+              FileDir = Path.dirname(FilePath),
+              Promises = [];
+          Content.forEach(function (Line, LeIndex) {
+            var Index;
+            if (Line.indexOf("/*") !== -1) {
+              Promises.push(new Promise(function (LineResolve, LineReject) {
+                Line = Line.trim();
+                Index = Line.indexOf("/*");
+                if (Index === -1 || Index !== 0) {
+                  return LineResolve(); // Ignore non-commented lines or lines with stuff + comments
+                }
+                if (CompilerCSS.RegexAppend.test(Line)) {
+                  CompilerCSS.ParseAppend(Line, FileDir, FilePath, !!Opts.SourceMap).then(function (Result) {
+                    Content[LeIndex] = Result;
+                    LineResolve();
+                  }, LineReject);
+                } else if (CompilerCSS.RegexOutput.test(Line)) {
+                  CompilerCSS.ExtractPath(Line, FileDir).then(function (Result) {
+                    Opts.TargetFile = Result;
+                    Content[LeIndex] = "";
+                    LineResolve();
+                  }, LineReject);
+                } else if (CompilerCSS.RegexSourceMap.test(Line)) {
+                  CompilerCSS.ExtractPath(Line, FileDir).then(function (Result) {
+                    Content[LeIndex] = "";
+                    if (Result === "") {
+                      Opts.SourceMap = null;
+                    } else {
+                      Opts.SourceMap = Result;
+                    }
+                    LineResolve();
+                  });
+                } else {
+                  LineResolve();
+                }
+              }));
+            }
+          });
+          Promise.all(Promises).then(function () {
+            ToReturn.Content = Content.join("\n");
+            resolve(ToReturn);
+          }, reject);
+        });
+      },
+      writable: true,
+      configurable: true
+    },
+    Process: {
+      value: function (FilePath, Opts) {
+        return new Promise(function (resolve, reject) {
+          FS.readFile(FilePath, function (Error, Content) {
+            if (Error) {
+              return reject(Error);
+            }
+            CompilerCSS.Parse(FilePath, Content.toString().split("\n"), Opts).then(function (Result) {
+              Opts = Result.Opts;
+              var HasSourceMap = Opts.SourceMap !== null,
+                  ToReturn = {
+                Content: "",
+                SourceMap: "",
+                Opts: Opts
+              },
+                  Output = null;
+              UglifyCSS = UglifyCSS || new (require("clean-css"))({ sourceMap: true });
+              Output = UglifyCSS.minify(Result.Content);
+              ToReturn.Content = Output.styles;
+              if (HasSourceMap) {
+                ToReturn.SourceMap = Output.sourceMap;
+                ToReturn.Content += "/*# sourceMappingURL=" + H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap) + " */";
+              }
+              resolve(ToReturn);
+            }, reject);
+          });
+        });
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return CompilerCSS;
+})();
+
+module.exports = CompilerCSS;
