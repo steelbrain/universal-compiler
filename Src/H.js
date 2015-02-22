@@ -45,5 +45,16 @@ class H{
       });
     });
   }
+  static FileExists(Path:String):Promise{
+    return new Promise(function(Resolve,Reject){
+      FS.exists(Path,function(Status){
+        if(Status){
+          Resolve();
+        } else {
+          Reject();
+        }
+      });
+    });
+  }
 }
 module.exports = H;
