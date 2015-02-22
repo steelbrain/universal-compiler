@@ -16,6 +16,7 @@ class CompilerJS{
   static RegexOutput:RegExp = /@Compiler-Output/;
   static RegexCompiler:RegExp = /@Compiler-Name/;
   static RegexSourceMap:RegExp = /@Compiler-Sourcemap/;
+  static RegexCompress:RegExp = /@Compiler-Compress/;
   static RegexExtract:RegExp = /".*"/;
   static init(LeCompiler):void{
     Compiler = LeCompiler;
@@ -49,7 +50,7 @@ class CompilerJS{
         if(!HasSourceMap){
           // Lets append it if we aren't giving em any source maps, EH!
           Compiler.Compile(Result).then(function(Result){
-            resolve('(function(){'+Result.Content+'})();');
+            resolve('(function(){'+Result.Content+'}).call(this);');
           },reject)
         } else {
           FS.readFile(Result, function (Error, LeContent) {
@@ -120,12 +121,18 @@ class CompilerJS{
                 LineResolve();
               },LineReject);
             } else if(CompilerJS.RegexSourceMap.test(Line)) {
-              CompilerJS.ExtractPath(Line, FileDir).then(function(Result){
-                if(Result === ''){
+              CompilerJS.ExtractPath(Line, FileDir).then(function (Result) {
+                if (Result === '') {
                   Opts.SourceMap = null;
                 } else {
                   Opts.SourceMap = Result;
                 }
+                Content[LeIndex] = '';
+                LineResolve();
+              });
+            } else if(CompilerJS.RegexCompress.test(Line)) {
+              CompilerJS.ExtractValue(Line).then(function (Result){
+                Opts.Compress = Result === 'true';
                 Content[LeIndex] = '';
                 LineResolve();
               });
@@ -159,23 +166,30 @@ class CompilerJS{
             Output = null;
           if(Opts.Compiler === 'Babel'){
             Babel = Babel || require('babel');
-            Output = Babel.transform(Result.Content,{sourceMap:HasSourceMap, playground:true, experimental:true});
+            Output = Babel.transform(Result.Content,{
+              sourceMap: HasSourceMap,
+              sourceFileName: Path.basename(FilePath),
+              filenameRelative: Path.basename(Opts.TargetFile),
+              playground: true
+            });
             ToReturn.Content = Output.code;
-            if(HasSourceMap){
-              ToReturn.SourceMap = JSON.stringify(Output.map);
-            }
+            ToReturn.SourceMap = JSON.stringify(Output.map);
           } else if(Opts.Compiler === 'ReactTools'){
             ReactTools = ReactTools || require('react-tools');
-            Output = ReactTools.transformWithDetails(Result.Content,{harmony:true,stripTypes:true,sourceMap:HasSourceMap});
+            Output = ReactTools.transformWithDetails(Result.Content,{
+              harmony:true,
+              stripTypes:true,
+              sourceMap:HasSourceMap,
+              filename: Path.basename(Opts.TargetFile)
+            });
+            Output.sourceMap.sources = [Path.basename(FilePath)];
             ToReturn.Content = Output.code;
-            if(HasSourceMap){
-              ToReturn.SourceMap = JSON.stringify(Output.sourceMap);
-            }
+            ToReturn.SourceMap = JSON.stringify(Output.sourceMap);
           } else if(Opts.Compiler === 'Riot'){
             Riot = Riot || require('riot');
             ToReturn.Content = Riot.compile(Result.Content,{compact:true});
           }
-          if((!Opts.Compiler && Opts.SourceMap) || !Opts.SourceMap){
+          if(Opts.Compress){
             UglifyJS = UglifyJS || require('uglify-js');
             try {
               Output = UglifyJS.minify(ToReturn.Content || Result.Content,{fromString: true,outSourceMap:HasSourceMap ? "js.map" : undefined});
@@ -187,11 +201,10 @@ class CompilerJS{
               ToReturn.SourceMap = Output.map;
             }
           }
-          if(HasSourceMap && Opts.Shebang === null){
+          if(HasSourceMap){
             ToReturn.Content += '//# sourceMappingURL=' + H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap);
           }
           if(Opts.Shebang){
-            ToReturn.SourceMap = ''; // Not sure if sourcemap works after you append a line, so disabling
             ToReturn.Content = Opts.Shebang + "\n" + ToReturn.Content;
           }
           resolve(ToReturn);
