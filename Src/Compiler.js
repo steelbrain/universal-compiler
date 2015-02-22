@@ -25,19 +25,14 @@ class Compiler{
   }
   Compile(SourceFile:String, TargetFile:String, SourceMap:String):Promise{
     return new Promise(function(resolve,reject){
-      FS.exists(SourceFile,function(Status){
-
-        if(!Status){
-          return reject(`Source file ${SourceFile} doesn't exist`);
-        }
-
+      H.FileExists(TargetFile).then(function(Status){
         var
           Extension = SourceFile.split('.').pop().toUpperCase(),
           Opts = H.Clone(this.Map[Extension].Opts);
         Opts.TargetFile = TargetFile || null;
         Opts.SourceMap = SourceMap || null;
         if(!this.Map.hasOwnProperty(Extension)){
-          return reject(`The given file type is not recognized`);
+          return reject('The given file type is not recognized');
         }
         this.Map[Extension].Compiler.Process(SourceFile, Opts).then(function(Result){
           Opts = Result.Opts;
@@ -55,8 +50,9 @@ class Compiler{
             }
           })
         },reject);
-
-      }.bind(this));
+      }.bind(this),function(){
+        return reject(`Source file ${SourceFile} doesn't exist`);
+      });
     }.bind(this));
   }
   Watch(Directory:String, Opts:Object){
