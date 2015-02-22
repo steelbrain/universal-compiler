@@ -1,6 +1,6 @@
 
 
-// @Compiler-Output "../Build/H.js"
+// @Compiler-Output "../Built/H.js"
 var Path = require('path');
 class H{
   static Relative(Path1:String, Path2:String):String{

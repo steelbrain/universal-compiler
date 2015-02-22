@@ -1,5 +1,5 @@
 #!/usr/bin/env nodejs
-// @Compiler-Output "../Build/Compiler-Exec.js"
+// @Compiler-Output "../Built/Compiler-Exec.js"
 
 
 var

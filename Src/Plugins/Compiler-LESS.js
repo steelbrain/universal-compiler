@@ -1,6 +1,6 @@
 
 
-// @Compiler-Output "../../Build/Plugins/Compiler-LESS.js"
+// @Compiler-Output "../../Built/Plugins/Compiler-LESS.js"
 var
   Promise = require('a-promise'),
   LESS = null,

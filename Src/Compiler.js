@@ -1,6 +1,6 @@
 
 
-// @Compiler-Output "../Build/Compiler.js"
+// @Compiler-Output "../Built/Compiler.js"
 var
   Promise = require('a-promise'),
   FS = require('fs'),
