@@ -63,5 +63,9 @@ class Compiler{
       }.bind(this));
     }.bind(this));
   }
+  Watch(Directory:String, Opts:Object){
+    console.log("I am a dummy La La La");
+    console.log(Opts);
+  }
 }
 module.exports = Compiler;
