@@ -31,7 +31,7 @@ export class Compiler{
           global.uc_compiler_debug("Compiler::Compile Unrecognized");
           return reject('The given file type is not recognized');
         }
-        Opts = Object.clone(Compiler.Map[Extension].Opts);
+        Opts = H.Clone(Compiler.Map[Extension].Opts);
         Opts.TargetFile = TargetFile || null;
         Opts.SourceMap = SourceMap || null;
         global.uc_compiler_debug("Compiler::Compile Pre-Process");
