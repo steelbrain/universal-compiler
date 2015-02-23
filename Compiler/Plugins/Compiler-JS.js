@@ -49,7 +49,12 @@ class CompilerJS extends CompilerBase{
       H.FileRead(FilePath).then(function(Content){
         global.uc_compiler_debug("CompilerJS::Process Parse");
         this.Parse(FilePath,Content,Opts).then(function(Parsed){
-          var ToReturn = {Content: Parsed.Content, SourceMap: '', Opts: Parsed.Opts};
+          var ToReturn = {
+            Content: Parsed.Content,
+            SourceMap: '',
+            Opts: Parsed.Opts,
+            HasSourceMap: Parsed.SourceMap !== null
+          };
           try {
             global.uc_compiler_debug("CompilerJS::Process Compile");
             if(Parsed.Opts.Compiler === 'Babel'){
@@ -69,7 +74,7 @@ class CompilerJS extends CompilerBase{
             global.uc_compiler_debug("CompilerJS::Process Compress");
             this.ProcessUglify(FilePath, ToReturn, Parsed);
           }
-          if(ToReturn.SourceMap !== null){
+          if(ToReturn.HasSourceMap){
             global.uc_compiler_debug("CompilerJS::Process SourceMap");
             ToReturn.Content += '//# sourceMappingURL=' + H.Relative(H.FileDir(Opts.TargetFile), Opts.SourceMap);
           }
@@ -102,7 +107,7 @@ class CompilerJS extends CompilerBase{
       sourceMap: Opts.SourceMap !== null,
       filename: Path.basename(Opts.TargetFile)
     });
-    if(Output.sourceMap !== null){
+    if(ToReturn.HasSourceMap){
       Output.sourceMap.sources = [Path.basename(FilePath)];
       ToReturn.SourceMap = JSON.stringify(Output.sourceMap);
     }
