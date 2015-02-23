@@ -1,6 +1,6 @@
 
 
-// @Compiler-Output "../Built/H.js"
+// @Compiler-Output "../Built/Compiler/H.js"
 var
   Path = require('path'),
   FS = require('fs');

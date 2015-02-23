@@ -1,6 +1,6 @@
 
 
-// @Compiler-Output "../Built/Compiler.js"
+// @Compiler-Output "../Built/Compiler/Compiler.js"
 var
   Promise = require('a-promise'),
   FS = require('fs'),
@@ -36,6 +36,7 @@ export class Compiler{
         Opts.SourceMap = SourceMap || null;
         global.uc_compiler_debug("Compiler::Compile Pre-Process");
         Compiler.Map[Extension].Compiler.Process(SourceFile, Opts).then(function(Result){
+          global.uc_compiler_debug("Compiler::Compile Continuing");
           Opts = Result.Opts;
           if( !Opts.TargetFile ){
             global.uc_compiler_debug("Compiler::Compile Return Processed");
@@ -47,9 +48,9 @@ export class Compiler{
             if(Error){
               return reject(Error);
             }
-            global.uc_compiler_debug("Compiler::Compile Write SourceMap");
-            global.uc_compiler_debug("Compiler::Compile SourceMap " + Opts.SourceMap);
             if( Opts.SourceMap ){
+              global.uc_compiler_debug("Compiler::Compile Write SourceMap");
+              global.uc_compiler_debug("Compiler::Compile SourceMap " + Opts.SourceMap);
               FS.writeFile(Opts.SourceMap,Result.SourceMap, resolve);
             } else {
               resolve();

@@ -1,6 +1,6 @@
 
 
-// @Compiler-Output "../../Built/Plugins/Compiler-Coffee.js"
+// @Compiler-Output "../../Built/Compiler/Plugins/Compiler-Coffee.js"
 var
   Promise = require('a-promise'),
   UglifyJS = null,

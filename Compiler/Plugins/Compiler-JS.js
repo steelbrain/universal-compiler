@@ -1,6 +1,6 @@
 
 
-// @Compiler-Output "../../Built/Plugins/Compiler-JS.js"
+// @Compiler-Output "../../Built/Compiler/Plugins/Compiler-JS.js"
 var
   Promise = require('a-promise'),
   UglifyJS = null,
@@ -77,6 +77,8 @@ class CompilerJS extends CompilerBase{
           if(ToReturn.HasSourceMap){
             global.uc_compiler_debug("CompilerJS::Process SourceMap");
             ToReturn.Content += '//# sourceMappingURL=' + H.Relative(H.FileDir(Opts.TargetFile), Opts.SourceMap);
+          } else {
+            ToReturn.SourceMap = '';
           }
           if(Opts.Shebang){
             global.uc_compiler_debug("CompilerJS::Process Shebang");
