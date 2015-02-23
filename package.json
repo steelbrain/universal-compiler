@@ -2,7 +2,7 @@
   "name": "universal-compiler",
   "version": "0.0.1",
   "description": "A universal Compiler for NodeJS",
-  "main": "compiler-exec.js",
+  "main": "Exec/Exec.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
