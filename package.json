@@ -22,7 +22,8 @@
     "coffee-script": "latest",
     "less": "latest",
     "clean-css": "latest",
-    "debug": "latest"
+    "debug": "latest",
+    "chokidar": "latest"
   },
   "keywords": [
     "compiler",
