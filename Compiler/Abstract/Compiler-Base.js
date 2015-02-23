@@ -1,9 +1,10 @@
 
 
+// @Compiler-Output "../../Built/Compiler/Abstract/Compiler-Base.js"
 var
   Path = require('path'),
   FS = require('fs'),
-//Promise = require('a-promise'), TODO: Fix a-promise and then do something here
+  Promise = require('a-promise'),
   H = require('../H');
 export class CompilerBase{
   static RegexLineInfo:RegExp = /@([a-zA-z1-9-]*) "(.*)"/;
@@ -24,7 +25,7 @@ export class CompilerBase{
         return Resolve();
       }
       Info = CompilerBase.RegexLineInfo.exec(Line);
-      if(Info.length !== 3 || !this.Map.Tags.hasOwnProperty(Info[1])){
+      if(!Info || Info.length !== 3 || !this.Map.Tags.hasOwnProperty(Info[1])){
         return Resolve();
       }
       Result = this.Map.Tags[Info[1]](Info,Opts,Content,Line,Index,FileDir,FilePath);
