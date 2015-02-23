@@ -22,7 +22,7 @@ var Watcher = (function (EventEmitter) {
     _classCallCheck(this, Watcher);
 
     this.Dir = FS.realpathSync(Dir);
-    this.ManifestPath = this.Dir + Path.sep + "DePros.json";
+    this.ManifestPath = this.Dir + Path.sep + "DeProc.json";
     CompilerH.FileExists(this.ManifestPath).then((function () {
       CompilerH.FileRead(this.ManifestPath).then((function (Contents) {
         this.Manifest = JSON.parse(Contents);
@@ -75,4 +75,5 @@ var WatcherControl = (function () {
   return WatcherControl;
 })();
 
+WatcherH.Init(WatcherControl);
 module.exports = { Watcher: Watcher, WatcherControl: WatcherControl };

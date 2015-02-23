@@ -5,9 +5,11 @@ FS = require 'fs'
 Path = require 'path'
 Promise = require 'a-promise'
 {Compiler} = require '../Compiler/Compiler'
-{WatcherControl} = require './Watcher'
+WatcherControl = null
 class H
   @ExcludedFiles = ['.git']
+  @Init:(WatcherControlClass)->
+    WatcherControl = WatcherControlClass
   @FileInfo:(LePath,Name)->
     Ext = Name.split('.').pop().toUpperCase()
     return unless WatcherControl.FileTypes.hasOwnProperty Ext

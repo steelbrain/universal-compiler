@@ -16,7 +16,7 @@ class Watcher extends EventEmitter{
   ManifestPath:String;
   constructor(Dir:String){
     this.Dir = FS.realpathSync(Dir);
-    this.ManifestPath = this.Dir + Path.sep + 'DePros.json';
+    this.ManifestPath = this.Dir + Path.sep + 'DeProc.json';
     CompilerH.FileExists(this.ManifestPath).then(function(){
       CompilerH.FileRead(this.ManifestPath).then(function(Contents){
         this.Manifest = JSON.parse(Contents);
@@ -50,4 +50,5 @@ class WatcherControl{
     }
   }
 }
+WatcherH.Init(WatcherControl);
 module.exports = {Watcher,WatcherControl};

@@ -9,12 +9,16 @@
 
   Compiler = require('../Compiler/Compiler').Compiler;
 
-  WatcherControl = require('./Watcher').WatcherControl;
+  WatcherControl = null;
 
   H = (function() {
     function H() {}
 
     H.ExcludedFiles = ['.git'];
+
+    H.Init = function(WatcherControlClass) {
+      return WatcherControl = WatcherControlClass;
+    };
 
     H.FileInfo = function(LePath, Name) {
       var Ext;
