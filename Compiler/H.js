@@ -34,9 +34,14 @@ class H{
     }
     return FilePath;
   }
-  static FileRead(Path:String):Promise{
+  static FileDir(FilePath:String):String{
+    FilePath = FilePath.split(Path.sep);
+    FilePath.pop();
+    return FilePath.join(Path.sep);
+  }
+  static FileRead(FilePath:String):Promise{
     return new Promise(function(Resolve,Reject){
-      FS.readFile(Path,function(Error,Content){
+      FS.readFile(FilePath,function(Error,Content){
         if(Error){
           Reject(Error);
         } else {
@@ -45,9 +50,9 @@ class H{
       });
     });
   }
-  static FileExists(Path:String):Promise{
+  static FileExists(FilePath:String):Promise{
     return new Promise(function(Resolve,Reject){
-      FS.exists(Path,function(Status){
+      FS.exists(FilePath,function(Status){
         if(Status){
           Resolve();
         } else {
