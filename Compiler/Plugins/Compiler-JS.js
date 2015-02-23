@@ -53,7 +53,7 @@ class CompilerJS extends CompilerBase{
             Content: Parsed.Content,
             SourceMap: '',
             Opts: Parsed.Opts,
-            HasSourceMap: Parsed.SourceMap !== null
+            HasSourceMap: Parsed.Opts.SourceMap !== null
           };
           try {
             global.uc_compiler_debug("CompilerJS::Process Compile");
