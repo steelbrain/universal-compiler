@@ -5,10 +5,10 @@ var
   Promise = require('a-promise'),
   FS = require('fs'),
   H = require('./H'),
-  CompilerJS = new (require('./Plugins/Compiler-JS'))(),
-  CompilerCoffee = new (require('./Plugins/Compiler-Coffee'))(),
-  CompilerLESS = new (require('./Plugins/Compiler-LESS'))(),
-  CompilerCSS = new (require('./Plugins/Compiler-CSS'))();
+  CompilerJS = new (require('./Plugins/Compiler-JS')),
+  CompilerCoffee = new (require('./Plugins/Compiler-Coffee')),
+  CompilerLESS = new (require('./Plugins/Compiler-LESS')),
+  CompilerCSS = new (require('./Plugins/Compiler-CSS'));
 export class Compiler{
   static Map:Object = {
     'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
@@ -50,9 +50,5 @@ export class Compiler{
         return reject(`Source file ${SourceFile} doesn't exist`);
       });
     });
-  }
-  static Watch(Directory:String, Opts:Object){
-    console.log("I am a dummy La La La");
-    console.log(Opts);
   }
 }
