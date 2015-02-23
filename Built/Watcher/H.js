@@ -1,5 +1,5 @@
 (function() {
-  var Compiler, FS, H, Path, Promise;
+  var Compiler, FS, H, Path, Promise, WatcherControl;
 
   FS = require('fs');
 
@@ -9,6 +9,8 @@
 
   Compiler = require('../Compiler/Compiler').Compiler;
 
+  WatcherControl = require('./Watcher').WatcherControl;
+
   H = (function() {
     function H() {}
 
@@ -17,14 +19,14 @@
     H.FileInfo = function(LePath, Name) {
       var Ext;
       Ext = Name.split('.').pop().toUpperCase();
-      if (!Compiler.Map.hasOwnProperty(Ext)) {
+      if (!WatcherControl.FileTypes.hasOwnProperty(Ext)) {
         return;
       }
       return {
         Path: LePath,
         Name: Name,
         Ext: Ext,
-        Config: {}
+        Config: WatcherControl.FileTypes[Ext]
       };
     };
 

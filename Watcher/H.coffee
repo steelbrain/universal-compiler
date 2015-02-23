@@ -5,12 +5,13 @@ FS = require 'fs'
 Path = require 'path'
 Promise = require 'a-promise'
 {Compiler} = require '../Compiler/Compiler'
+{WatcherControl} = require './Watcher'
 class H
   @ExcludedFiles = ['.git']
   @FileInfo:(LePath,Name)->
     Ext = Name.split('.').pop().toUpperCase()
-    return unless Compiler.Map.hasOwnProperty Ext
-    return Path: LePath, Name:Name, Ext:Ext, Config:Compiler.Map[Ext].Opts
+    return unless WatcherControl.FileTypes.hasOwnProperty Ext
+    return Path: LePath, Name:Name, Ext:Ext, Config: WatcherControl.FileTypes[Ext]
   @Manifest:(Dir)->
     return new Promise (resolve)->
       H.ScanDir(Dir).then (Items)->

@@ -32,6 +32,14 @@ class Watcher extends EventEmitter{
   }
 }
 class WatcherControl{
+  static FileTypes:Object = {
+    'JS': {Compress: false, Compiler: ['Babel','ReactTools','Riot'], SourceMap: null},
+    'JSX': {Compress: false, Compiler: ['Babel','ReactTools','Riot'], SourceMap: null},
+    'TAG': {Compress: false, Compiler: ['Riot'], SourceMap: null},
+    'COFFEE': {Compress: false, SourceMap: null},
+    'LESS': {Compress: false, SourceMap: null},
+    'CSS': {Compress: false, SourceMap: null}
+  };
   static Watch(Dir:String){
     if(CompilerH.FileExists(Dir)){
       global.uc_watcher_debug("WatcherControl::Watch Initiating new Watcher");

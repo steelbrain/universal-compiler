@@ -47,6 +47,15 @@ var WatcherControl = (function () {
     _classCallCheck(this, WatcherControl);
   }
 
+  WatcherControl.FileTypes = {
+    JS: { Compress: false, Compiler: ["Babel", "ReactTools", "Riot"], SourceMap: null },
+    JSX: { Compress: false, Compiler: ["Babel", "ReactTools", "Riot"], SourceMap: null },
+    TAG: { Compress: false, Compiler: ["Riot"], SourceMap: null },
+    COFFEE: { Compress: false, SourceMap: null },
+    LESS: { Compress: false, SourceMap: null },
+    CSS: { Compress: false, SourceMap: null }
+  };
+
   _prototypeProperties(WatcherControl, {
     Watch: {
       value: function Watch(Dir) {
