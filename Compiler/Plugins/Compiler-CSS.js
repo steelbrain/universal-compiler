@@ -6,7 +6,7 @@ var
   UglifyCSS = null,
   H = require('../H'),
   Path = require('path'),
-  Compiler = null,
+  Compiler = require('../Compiler'),
   CompilerBase = require('../Abstract/Compiler-Base').CompilerBase;
 class CompilerCSS extends CompilerBase{
   Map:Object = {
@@ -30,9 +30,6 @@ class CompilerCSS extends CompilerBase{
       }
     }
   };
-  constructor(CompilerInst){
-    Compiler = CompilerInst;
-  }
   Process(FilePath:String, Opts:Object):Promise{
     return new Promise(function(Resolve,Reject){
       H.FileRead(FilePath).then(function(Content){

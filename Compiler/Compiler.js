@@ -4,37 +4,33 @@
 var
   Promise = require('a-promise'),
   FS = require('fs'),
-  H = require('./H');
-class Compiler{
-  Map:Object;
-
-  constructor(){
-    var
-      CompilerJS = new (require('./Plugins/Compiler-JS'))(this),
-      CompilerCoffee = new (require('./Plugins/Compiler-Coffee'))(this),
-      CompilerLESS = new (require('./Plugins/Compiler-LESS'))(this),
-      CompilerCSS = new (require('./Plugins/Compiler-CSS'))(this);
-    this.Map = {
-      'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
-      'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
-      'TAG': {Compiler: CompilerJS, Opts:{Compiler:'Riot', Shebang: null, Compress:false}},
-      'COFFEE': {Compiler: CompilerCoffee, Opts:{Shebang: null, Compress: false}},
-      'LESS': {Compiler: CompilerLESS, Opts:{Compress: false}},
-      'CSS': {Compiler: CompilerCSS, Opts:{Compress: false}}
-    };
-  }
-  Compile(SourceFile:String, TargetFile:String, SourceMap:String):Promise{
+  H = require('./H'),
+  CompilerJS = new (require('./Plugins/Compiler-JS'))(),
+  CompilerCoffee = new (require('./Plugins/Compiler-Coffee'))(),
+  CompilerLESS = new (require('./Plugins/Compiler-LESS'))(),
+  CompilerCSS = new (require('./Plugins/Compiler-CSS'))();
+export class Compiler{
+  static Map:Object = {
+    'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
+    'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
+    'TAG': {Compiler: CompilerJS, Opts:{Compiler:'Riot', Shebang: null, Compress:false}},
+    'COFFEE': {Compiler: CompilerCoffee, Opts:{Shebang: null, Compress: false}},
+    'LESS': {Compiler: CompilerLESS, Opts:{Compress: false}},
+    'CSS': {Compiler: CompilerCSS, Opts:{Compress: false}}
+  };
+  static Compile(SourceFile:String, TargetFile:String, SourceMap:String):Promise{
     return new Promise(function(resolve,reject){
       H.FileExists(SourceFile).then(function(){
         var
           Extension = SourceFile.split('.').pop().toUpperCase(),
-          Opts = H.Clone(this.Map[Extension].Opts);
-        Opts.TargetFile = TargetFile || null;
-        Opts.SourceMap = SourceMap || null;
-        if(!this.Map.hasOwnProperty(Extension)){
+          Opts = null;
+        if(!Compiler.Map.hasOwnProperty(Extension)){
           return reject('The given file type is not recognized');
         }
-        this.Map[Extension].Compiler.Process(SourceFile, Opts).then(function(Result){
+        Opts = H.Clone(Compiler.Map[Extension].Opts);
+        Opts.TargetFile = TargetFile || null;
+        Opts.SourceMap = SourceMap || null;
+        Compiler.Map[Extension].Compiler.Process(SourceFile, Opts).then(function(Result){
           Opts = Result.Opts;
           if( !Opts.TargetFile ){
             return resolve(Result);
@@ -50,14 +46,13 @@ class Compiler{
             }
           })
         },reject);
-      }.bind(this),function(){
+      },function(){
         return reject(`Source file ${SourceFile} doesn't exist`);
       });
-    }.bind(this));
+    });
   }
-  Watch(Directory:String, Opts:Object){
+  static Watch(Directory:String, Opts:Object){
     console.log("I am a dummy La La La");
     console.log(Opts);
   }
 }
-module.exports = Compiler;
