@@ -16,7 +16,7 @@
 
     H.FileInfo = function(LePath, Name) {
       var Ext;
-      Ext = Name.split('.').pop();
+      Ext = Name.split('.').pop().toUpperCase();
       if (!Compiler.Map.hasOwnProperty(Ext)) {
         return;
       }
@@ -26,6 +26,17 @@
         Ext: Ext,
         Config: {}
       };
+    };
+
+    H.Manifest = function(Dir) {
+      return new Promise(function(resolve) {
+        return H.ScanDir(Dir).then(function(Items) {
+          return resolve({
+            Name: Path.basename(Dir),
+            Items: Items
+          });
+        });
+      });
     };
 
     H.ScanDir = function(LePath) {
