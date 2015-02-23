@@ -61,5 +61,41 @@ class H{
       });
     });
   }
+  static Each(object,callback){
+    var i, ret;
+    if(!object) return ;
+    try{
+      if(typeof object.length !== 'undefined' && typeof object !== 'function'){
+        if(typeof object.elements !== 'undefined'){
+          object = object.elements;
+        }
+        Array.prototype.forEach.call(object,function(element,index,array){
+          if(callback.call(element,element,index,array) === false)
+            throw null;
+        });
+      } else {
+        for(i in object){
+          if(object.hasOwnProperty(i)){
+            if(callback.call(object[i],object[i],i,object) === false)
+              break;
+          }
+        }
+      }
+    } catch(e){}
+  }
+  static Extend(Out){
+    Out = Out || {};
+    H.Each(Array.prototype.slice.call(arguments,1),function(obj){
+      H.Each(obj,function(val,key){
+        if(typeof val === 'object' && val !== null){
+          Out[key] = Out[key] || {};
+          H.Extend(Out[key],val);
+        } else {
+          Out[key] = val;
+        }
+      });
+    });
+    return Out;
+  }
 }
 module.exports = H;
