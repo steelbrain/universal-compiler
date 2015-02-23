@@ -30,19 +30,6 @@ var H = (function () {
       writable: true,
       configurable: true
     },
-    Clone: {
-      value: function Clone(obj) {
-        if (null == obj || "object" != typeof obj) {
-          return obj;
-        }var copy = obj.constructor();
-        for (var attr in obj) {
-          if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-        }
-        return copy;
-      },
-      writable: true,
-      configurable: true
-    },
     ABSPath: {
       value: function ABSPath(FilePath, FileDir) {
         if (FilePath.substr(0, 1) !== Path.sep && FilePath.substr(1, 1) !== ":") {

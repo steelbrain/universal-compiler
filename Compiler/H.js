@@ -19,14 +19,6 @@ class H{
       RelativePath.join(Path.sep) + Path.sep + Path2.join(Path.sep) :
       Path2.join(Path.sep);
   }
-  static Clone(obj) {
-    if (null == obj || "object" != typeof obj) return obj;
-    var copy = obj.constructor();
-    for (var attr in obj) {
-      if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-    }
-    return copy;
-  }
   static ABSPath(FilePath:String, FileDir:String):String{
     if (FilePath.substr(0, 1) !== Path.sep &&
       FilePath.substr(1, 1) !== ':') { // Windows Drive `D:\`
