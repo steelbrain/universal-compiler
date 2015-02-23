@@ -25,7 +25,7 @@ class Compiler{
   }
   Compile(SourceFile:String, TargetFile:String, SourceMap:String):Promise{
     return new Promise(function(resolve,reject){
-      H.FileExists(TargetFile).then(function(Status){
+      H.FileExists(SourceFile).then(function(){
         var
           Extension = SourceFile.split('.').pop().toUpperCase(),
           Opts = H.Clone(this.Map[Extension].Opts);
