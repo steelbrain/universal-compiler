@@ -45,29 +45,39 @@ class CompilerJS extends CompilerBase{
   };
   Process(FilePath:String, Opts:Object):Promise{
     return new Promise(function(Resolve,Reject){
+      global.uc_compiler_debug("CompilerJS::Process Read");
       H.FileRead(FilePath).then(function(Content){
+        global.uc_compiler_debug("CompilerJS::Process Parse");
         this.Parse(FilePath,Content,Opts).then(function(Parsed){
           var ToReturn = {Content: Parsed.Content, SourceMap: '', Opts: Parsed.Opts};
           try {
+            global.uc_compiler_debug("CompilerJS::Process Compile");
             if(Parsed.Opts.Compiler === 'Babel'){
+              global.uc_compiler_debug("CompilerJS::Process Compiler Babel");
               this.ProcessBabel(FilePath, ToReturn, Parsed);
             } else if(Parsed.Opts.Compiler === 'ReactTools'){
+              global.uc_compiler_debug("CompilerJS::Process Compiler ReactTools");
               this.ProcessReact(FilePath, ToReturn, Parsed);
             } else if(Parsed.Opts.Compiler === 'Riot'){
+              global.uc_compiler_debug("CompilerJS::Process Compiler Riot");
               this.ProcessRiot(FilePath, ToReturn, Parsed);
             }
           } catch(error){
             Reject(error);
           }
           if(Opts.Compress){
+            global.uc_compiler_debug("CompilerJS::Process Compress");
             this.ProcessUglify(FilePath, ToReturn, Parsed);
           }
           if(ToReturn.SourceMap !== null){
+            global.uc_compiler_debug("CompilerJS::Process SourceMap");
             ToReturn.Content += '//# sourceMappingURL=' + H.Relative(H.FileDir(Opts.TargetFile), Opts.SourceMap);
           }
           if(Opts.Shebang){
+            global.uc_compiler_debug("CompilerJS::Process Shebang");
             ToReturn.Content = Opts.Shebang + "\n" + ToReturn.Content;
           }
+          global.uc_compiler_debug("CompilerJS::Process Resolving");
           Resolve(ToReturn);
         }.bind(this),Reject);
       }.bind(this),Reject);

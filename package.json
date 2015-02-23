@@ -21,7 +21,8 @@
     "a-promise": "latest",
     "coffee-script": "latest",
     "less": "latest",
-    "clean-css": "latest"
+    "clean-css": "latest",
+    "debug": "latest"
   },
   "keywords": [
     "compiler",
