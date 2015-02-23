@@ -7,7 +7,7 @@ var
   LESS = null,
   H = require('../H'),
   Path = require('path'),
-  Compiler = require('../Compiler'),
+  {Compiler} = require('../Compiler'),
   CompilerBase = require('../Abstract/Compiler-Base').CompilerBase;
 class CompilerLESS extends CompilerBase{
   Map:Object = {
@@ -50,7 +50,7 @@ class CompilerLESS extends CompilerBase{
     return new Promise(function(Resolve,Reject){
       var
         Temp = null,
-        SourceMapURL = Opts.SourceMap !== null ? H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap) : null,
+        SourceMapURL = Opts.SourceMap !== null ? H.Relative(H.FileDir(Opts.TargetFile), Opts.SourceMap) : null,
         FileDir = Path.dirname(FilePath);
       LESS = LESS || require('less');
       LESS.render(Content,{

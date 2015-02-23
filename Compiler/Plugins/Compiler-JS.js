@@ -9,7 +9,7 @@ var
   ReactTools = null,
   H = require('../H'),
   Path = require('path'),
-  Compiler = require('../Compiler'),
+  {Compiler} = require('../Compiler'),
   CompilerBase = require('../Abstract/Compiler-Base').CompilerBase;
 class CompilerJS extends CompilerBase{
   Map:Object = {
@@ -62,8 +62,8 @@ class CompilerJS extends CompilerBase{
           if(Opts.Compress){
             this.ProcessUglify(FilePath, ToReturn, Parsed);
           }
-          if(ToReturn.SourceMap){
-            ToReturn.Content += '//# sourceMappingURL=' + H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap);
+          if(ToReturn.SourceMap !== null){
+            ToReturn.Content += '//# sourceMappingURL=' + H.Relative(H.FileDir(Opts.TargetFile), Opts.SourceMap);
           }
           if(Opts.Shebang){
             ToReturn.Content = Opts.Shebang + "\n" + ToReturn.Content;
@@ -92,7 +92,7 @@ class CompilerJS extends CompilerBase{
       sourceMap: Opts.SourceMap !== null,
       filename: Path.basename(Opts.TargetFile)
     });
-    if(Output.sourceMap){
+    if(Output.sourceMap !== null){
       Output.sourceMap.sources = [Path.basename(FilePath)];
       ToReturn.SourceMap = JSON.stringify(Output.sourceMap);
     }

@@ -6,7 +6,7 @@ var
   UglifyCSS = null,
   H = require('../H'),
   Path = require('path'),
-  Compiler = require('../Compiler'),
+  {Compiler} = require('../Compiler'),
   CompilerBase = require('../Abstract/Compiler-Base').CompilerBase;
 class CompilerCSS extends CompilerBase{
   Map:Object = {

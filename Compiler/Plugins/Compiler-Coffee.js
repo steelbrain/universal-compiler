@@ -7,7 +7,7 @@ var
   CoffeeScript = null,
   H = require('../H'),
   Path = require('path'),
-  Compiler = require('../Compiler'),
+  {Compiler} = require('../Compiler'),
   CompilerBase = require('../Abstract/Compiler-Base').CompilerBase;
 class CompilerCoffee extends CompilerBase{
   Map:Object = {
@@ -44,8 +44,8 @@ class CompilerCoffee extends CompilerBase{
           if(Opts.Compress){
             this.ProcessUglify(FilePath, ToReturn, Parsed);
           }
-          if(Opts.SourceMap){
-            ToReturn.Content += '//# sourceMappingURL=' + H.Relative(Path.dirname(Opts.TargetFile), Opts.SourceMap);
+          if(Opts.SourceMap !== null){
+            ToReturn.Content += '//# sourceMappingURL=' + H.Relative(H.FileDir(Opts.TargetFile), Opts.SourceMap);
           }
           if(Opts.Shebang){
             ToReturn.Content = Opts.Shebang + "\n" + ToReturn.Content;
