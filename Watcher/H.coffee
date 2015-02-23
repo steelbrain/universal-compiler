@@ -10,7 +10,7 @@ class H
   @FileInfo:(LePath,Name)->
     Ext = Name.split('.').pop().toUpperCase()
     return unless Compiler.Map.hasOwnProperty Ext
-    return Path: LePath, Name:Name, Ext:Ext, Config:{}
+    return Path: LePath, Name:Name, Ext:Ext, Config:Compiler.Map[Ext].Opts
   @Manifest:(Dir)->
     return new Promise (resolve)->
       H.ScanDir(Dir).then (Items)->
