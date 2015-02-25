@@ -6,177 +6,179 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var Promise = require("a-promise");
-var UglifyJS = null;
-var Babel = null;
-var Riot = null;
-var ReactTools = null;
-var H = require("../H");
-var Path = require("path");
-var _require = require("../Compiler");
+module.exports = function (Compiler) {
+  var Promise = require("a-promise");
+  var UglifyJS = null;
+  var Babel = null;
+  var Riot = null;
+  var ReactTools = null;
+  var H = require("../H");
+  var Path = require("path");
+  var _require = require("../Abstract/Compiler-Base");
 
-var Compiler = _require.Compiler;
-var CompilerBase = require("../Abstract/Compiler-Base").CompilerBase;
-var CompilerJS = (function (CompilerBase) {
-  function CompilerJS() {
-    this.Map = {
-      Comments: ["/*", "//"],
-      Tags: {
-        "Compiler-Output": function (Info, Opts, Content, Line, Index, FileDir) {
-          Opts.TargetFile = H.ABSPath(Info[2], FileDir);
-        },
-        "Compiler-SourceMap": function (Info, Opts, Content, Line, Index, FileDir) {
-          Opts.SourceMap = H.ABSPath(Info[2], FileDir);
-        },
-        "Compiler-Compress": function (Info, Opts) {
-          Opts.Compress = Info[2] === "true";
-        },
-        "Compiler-Name": function (Info, Opts) {
-          Info[2] = Info[2].toUpperCase();
-          if (Info[2] === "BABEL") {
-            Opts.Compiler = "Babel";
-          } else if (Info[2] === "REACTTOOLS") {
-            Opts.Compiler = "ReactTools";
-          } else if (Info[2] === "RIOT") {
-            Opts.Compiler = "Riot";
+  var CompilerBase = _require.CompilerBase;
+
+  var CompilerJS = (function (CompilerBase) {
+    function CompilerJS() {
+      this.Map = {
+        Comments: ["/*", "//"],
+        Tags: {
+          "Compiler-Output": function (Info, Opts, Content, Line, Index, FileDir) {
+            Opts.TargetFile = H.ABSPath(Info[2], FileDir);
+          },
+          "Compiler-SourceMap": function (Info, Opts, Content, Line, Index, FileDir) {
+            Opts.SourceMap = H.ABSPath(Info[2], FileDir);
+          },
+          "Compiler-Compress": function (Info, Opts) {
+            Opts.Compress = Info[2] === "true";
+          },
+          "Compiler-Name": function (Info, Opts) {
+            Info[2] = Info[2].toUpperCase();
+            if (Info[2] === "BABEL") {
+              Opts.Compiler = "Babel";
+            } else if (Info[2] === "REACTTOOLS") {
+              Opts.Compiler = "ReactTools";
+            } else if (Info[2] === "RIOT") {
+              Opts.Compiler = "Riot";
+            }
+          },
+          "Compiler-Append": function (Info, Opts, Content, Line, Index, FileDir) {
+            return new Promise(function (Resolve, Reject) {
+              Compiler.Compile(H.ABSPath(Info[2], FileDir)).then(function (Result) {
+                Resolve(Result.Content);
+              }, Reject);
+            });
           }
-        },
-        "Compiler-Append": function (Info, Opts, Content, Line, Index, FileDir) {
-          return new Promise(function (Resolve, Reject) {
-            Compiler.Compile(H.ABSPath(Info[2], FileDir)).then(function (Result) {
-              Resolve(Result.Content);
-            }, Reject);
-          });
         }
+      };
+
+      _classCallCheck(this, CompilerJS);
+
+      if (CompilerBase != null) {
+        CompilerBase.apply(this, arguments);
       }
-    };
-
-    _classCallCheck(this, CompilerJS);
-
-    if (CompilerBase != null) {
-      CompilerBase.apply(this, arguments);
     }
-  }
 
-  _inherits(CompilerJS, CompilerBase);
+    _inherits(CompilerJS, CompilerBase);
 
-  _prototypeProperties(CompilerJS, null, {
-    Process: {
-      value: function Process(FilePath, Opts) {
-        return new Promise((function (Resolve, Reject) {
-          global.uc_compiler_debug("CompilerJS::Process Read");
-          H.FileRead(FilePath).then((function (Content) {
-            global.uc_compiler_debug("CompilerJS::Process Parse");
-            this.Parse(FilePath, Content, Opts).then((function (Parsed) {
-              var ToReturn = {
-                Content: Parsed.Content,
-                SourceMap: "",
-                Opts: Parsed.Opts,
-                HasSourceMap: Parsed.Opts.SourceMap !== null
-              };
-              try {
-                global.uc_compiler_debug("CompilerJS::Process Compile");
-                if (Parsed.Opts.Compiler === "Babel") {
-                  global.uc_compiler_debug("CompilerJS::Process Compiler Babel");
-                  this.ProcessBabel(FilePath, ToReturn, Parsed);
-                } else if (Parsed.Opts.Compiler === "ReactTools") {
-                  global.uc_compiler_debug("CompilerJS::Process Compiler ReactTools");
-                  this.ProcessReact(FilePath, ToReturn, Parsed);
-                } else if (Parsed.Opts.Compiler === "Riot") {
-                  global.uc_compiler_debug("CompilerJS::Process Compiler Riot");
-                  this.ProcessRiot(FilePath, ToReturn, Parsed);
+    _prototypeProperties(CompilerJS, null, {
+      Process: {
+        value: function Process(FilePath, Opts) {
+          return new Promise((function (Resolve, Reject) {
+            global.uc_compiler_debug("CompilerJS::Process Read");
+            H.FileRead(FilePath).then((function (Content) {
+              global.uc_compiler_debug("CompilerJS::Process Parse");
+              this.Parse(FilePath, Content, Opts).then((function (Parsed) {
+                var ToReturn = {
+                  Content: Parsed.Content,
+                  SourceMap: "",
+                  Opts: Parsed.Opts,
+                  HasSourceMap: Parsed.Opts.SourceMap !== null
+                };
+                try {
+                  global.uc_compiler_debug("CompilerJS::Process Compile");
+                  if (Parsed.Opts.Compiler === "Babel") {
+                    global.uc_compiler_debug("CompilerJS::Process Compiler Babel");
+                    this.ProcessBabel(FilePath, ToReturn, Parsed);
+                  } else if (Parsed.Opts.Compiler === "ReactTools") {
+                    global.uc_compiler_debug("CompilerJS::Process Compiler ReactTools");
+                    this.ProcessReact(FilePath, ToReturn, Parsed);
+                  } else if (Parsed.Opts.Compiler === "Riot") {
+                    global.uc_compiler_debug("CompilerJS::Process Compiler Riot");
+                    this.ProcessRiot(FilePath, ToReturn, Parsed);
+                  }
+                } catch (error) {
+                  Reject(error);
                 }
-              } catch (error) {
-                Reject(error);
-              }
-              if (Opts.Compress) {
-                global.uc_compiler_debug("CompilerJS::Process Compress");
-                this.ProcessUglify(FilePath, ToReturn, Parsed);
-              }
-              if (ToReturn.HasSourceMap) {
-                global.uc_compiler_debug("CompilerJS::Process SourceMap");
-                ToReturn.Content += "//# sourceMappingURL=" + H.Relative(H.FileDir(Opts.TargetFile), Opts.SourceMap);
-              } else {
-                ToReturn.SourceMap = "";
-              }
-              if (Opts.Shebang) {
-                global.uc_compiler_debug("CompilerJS::Process Shebang");
-                ToReturn.Content = Opts.Shebang + "\n" + ToReturn.Content;
-              }
-              global.uc_compiler_debug("CompilerJS::Process Resolving");
-              Resolve(ToReturn);
+                if (Opts.Compress) {
+                  global.uc_compiler_debug("CompilerJS::Process Compress");
+                  this.ProcessUglify(FilePath, ToReturn, Parsed);
+                }
+                if (ToReturn.HasSourceMap) {
+                  global.uc_compiler_debug("CompilerJS::Process SourceMap");
+                  ToReturn.Content += "//# sourceMappingURL=" + H.Relative(H.FileDir(Opts.TargetFile), Opts.SourceMap);
+                } else {
+                  ToReturn.SourceMap = "";
+                }
+                if (Opts.Shebang) {
+                  global.uc_compiler_debug("CompilerJS::Process Shebang");
+                  ToReturn.Content = Opts.Shebang + "\n" + ToReturn.Content;
+                }
+                global.uc_compiler_debug("CompilerJS::Process Resolving");
+                Resolve(ToReturn);
+              }).bind(this), Reject);
             }).bind(this), Reject);
-          }).bind(this), Reject);
-        }).bind(this));
+          }).bind(this));
+        },
+        writable: true,
+        configurable: true
       },
-      writable: true,
-      configurable: true
-    },
-    ProcessBabel: {
-      value: function ProcessBabel(FilePath, ToReturn, _ref) {
-        var Opts = _ref.Opts;
-        var Content = _ref.Content;
+      ProcessBabel: {
+        value: function ProcessBabel(FilePath, ToReturn, _ref) {
+          var Opts = _ref.Opts;
+          var Content = _ref.Content;
 
-        Babel = Babel || require("babel");
-        var Output = Babel.transform(Content, {
-          sourceMap: Opts.SourceMap !== null,
-          sourceFileName: Path.basename(FilePath),
-          filenameRelative: Path.basename(Opts.TargetFile),
-          playground: true
-        });
-        ToReturn.Content = Output.code;
-        ToReturn.SourceMap = JSON.stringify(Output.map);
+          Babel = Babel || require("babel");
+          var Output = Babel.transform(Content, {
+            sourceMap: Opts.SourceMap !== null,
+            sourceFileName: Path.basename(FilePath),
+            filenameRelative: Path.basename(Opts.TargetFile),
+            playground: true
+          });
+          ToReturn.Content = Output.code;
+          ToReturn.SourceMap = JSON.stringify(Output.map);
+        },
+        writable: true,
+        configurable: true
       },
-      writable: true,
-      configurable: true
-    },
-    ProcessReact: {
-      value: function ProcessReact(FilePath, ToReturn, _ref) {
-        var Opts = _ref.Opts;
-        var Content = _ref.Content;
+      ProcessReact: {
+        value: function ProcessReact(FilePath, ToReturn, _ref) {
+          var Opts = _ref.Opts;
+          var Content = _ref.Content;
 
-        ReactTools = ReactTools || require("react-tools");
-        var Output = ReactTools.transformWithDetails(Content, {
-          harmony: true,
-          stripTypes: true,
-          sourceMap: Opts.SourceMap !== null,
-          filename: Path.basename(Opts.TargetFile)
-        });
-        if (ToReturn.HasSourceMap) {
-          Output.sourceMap.sources = [Path.basename(FilePath)];
-          ToReturn.SourceMap = JSON.stringify(Output.sourceMap);
-        }
-        ToReturn.Content = Output.code;
+          ReactTools = ReactTools || require("react-tools");
+          var Output = ReactTools.transformWithDetails(Content, {
+            harmony: true,
+            stripTypes: true,
+            sourceMap: Opts.SourceMap !== null,
+            filename: Path.basename(Opts.TargetFile)
+          });
+          if (ToReturn.HasSourceMap) {
+            Output.sourceMap.sources = [Path.basename(FilePath)];
+            ToReturn.SourceMap = JSON.stringify(Output.sourceMap);
+          }
+          ToReturn.Content = Output.code;
+        },
+        writable: true,
+        configurable: true
       },
-      writable: true,
-      configurable: true
-    },
-    ProcessRiot: {
-      value: function ProcessRiot(FilePath, ToReturn, _ref) {
-        var Opts = _ref.Opts;
-        var Content = _ref.Content;
+      ProcessRiot: {
+        value: function ProcessRiot(FilePath, ToReturn, _ref) {
+          var Opts = _ref.Opts;
+          var Content = _ref.Content;
 
-        Riot = Riot || require("riot");
-        ToReturn.Content = Riot.compile(Content, { compact: true });
+          Riot = Riot || require("riot");
+          ToReturn.Content = Riot.compile(Content, { compact: true });
+        },
+        writable: true,
+        configurable: true
       },
-      writable: true,
-      configurable: true
-    },
-    ProcessUglify: {
-      value: function ProcessUglify(FilePath, ToReturn, _ref) {
-        var Opts = _ref.Opts;
-        var Content = _ref.Content;
+      ProcessUglify: {
+        value: function ProcessUglify(FilePath, ToReturn, _ref) {
+          var Opts = _ref.Opts;
+          var Content = _ref.Content;
 
-        UglifyJS = UglifyJS || require("uglify-js");
-        ToReturn.Content = UglifyJS.minify(ToReturn.Content, { fromString: true }).code;
-        ToReturn.SourceMap = "";
-      },
-      writable: true,
-      configurable: true
-    }
-  });
+          UglifyJS = UglifyJS || require("uglify-js");
+          ToReturn.Content = UglifyJS.minify(ToReturn.Content, { fromString: true }).code;
+          ToReturn.SourceMap = "";
+        },
+        writable: true,
+        configurable: true
+      }
+    });
+
+    return CompilerJS;
+  })(CompilerBase);
 
   return CompilerJS;
-})(CompilerBase);
-
-module.exports = CompilerJS;
+};

@@ -7,27 +7,38 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 var Promise = require("a-promise"),
     FS = require("fs"),
     H = require("./H"),
-    CompilerJS = new (require("./Plugins/Compiler-JS"))(),
-    CompilerCoffee = new (require("./Plugins/Compiler-Coffee"))(),
-    CompilerLESS = new (require("./Plugins/Compiler-LESS"))(),
-    CompilerCSS = new (require("./Plugins/Compiler-CSS"))();
+    CompilerJS = require("./Plugins/Compiler-JS"),
+    CompilerCoffee = require("./Plugins/Compiler-Coffee"),
+    CompilerLESS = require("./Plugins/Compiler-LESS"),
+    CompilerCSS = require("./Plugins/Compiler-CSS");
 global.uc_compiler_debug = require("debug")("uc-compiler");
 
-var Compiler = exports.Compiler = (function () {
+var Compiler = (function () {
   function Compiler() {
     _classCallCheck(this, Compiler);
   }
 
-  Compiler.Map = {
-    JS: { Compiler: CompilerJS, Opts: { Compiler: "Babel", Shebang: null, Compress: false } },
-    JSX: { Compiler: CompilerJS, Opts: { Compiler: "Babel", Shebang: null, Compress: false } },
-    TAG: { Compiler: CompilerJS, Opts: { Compiler: "Riot", Shebang: null, Compress: false } },
-    COFFEE: { Compiler: CompilerCoffee, Opts: { Shebang: null, Compress: false } },
-    LESS: { Compiler: CompilerLESS, Opts: { Compress: false } },
-    CSS: { Compiler: CompilerCSS, Opts: { Compress: false } }
-  };
+  Compiler.Map = {};
 
   _prototypeProperties(Compiler, {
+    Init: {
+      value: function Init() {
+        CompilerJS = new (CompilerJS(Compiler))();
+        CompilerCoffee = new (CompilerCoffee(Compiler))();
+        CompilerLESS = new (CompilerLESS(Compiler))();
+        CompilerCSS = new (CompilerCSS(Compiler))();
+        Compiler.Map = {
+          JS: { Compiler: CompilerJS, Opts: { Compiler: "Babel", Shebang: null, Compress: false } },
+          JSX: { Compiler: CompilerJS, Opts: { Compiler: "Babel", Shebang: null, Compress: false } },
+          TAG: { Compiler: CompilerJS, Opts: { Compiler: "Riot", Shebang: null, Compress: false } },
+          COFFEE: { Compiler: CompilerCoffee, Opts: { Shebang: null, Compress: false } },
+          LESS: { Compiler: CompilerLESS, Opts: { Compress: false } },
+          CSS: { Compiler: CompilerCSS, Opts: { Compress: false } }
+        };
+      },
+      writable: true,
+      configurable: true
+    },
     Compile: {
       value: function Compile(SourceFile, TargetFile, SourceMap) {
         global.uc_compiler_debug("Compiler::Compile " + SourceFile);
@@ -80,6 +91,5 @@ var Compiler = exports.Compiler = (function () {
   return Compiler;
 })();
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+Compiler.Init();
+module.exports = { Compiler: Compiler };

@@ -5,20 +5,27 @@ var
   Promise = require('a-promise'),
   FS = require('fs'),
   H = require('./H'),
-  CompilerJS = new (require('./Plugins/Compiler-JS')),
-  CompilerCoffee = new (require('./Plugins/Compiler-Coffee')),
-  CompilerLESS = new (require('./Plugins/Compiler-LESS')),
-  CompilerCSS = new (require('./Plugins/Compiler-CSS'));
+  CompilerJS = require('./Plugins/Compiler-JS'),
+  CompilerCoffee = require('./Plugins/Compiler-Coffee'),
+  CompilerLESS = require('./Plugins/Compiler-LESS'),
+  CompilerCSS = require('./Plugins/Compiler-CSS');
 global.uc_compiler_debug = require('debug')('uc-compiler');
-export class Compiler{
-  static Map:Object = {
-    'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
-    'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
-    'TAG': {Compiler: CompilerJS, Opts:{Compiler:'Riot', Shebang: null, Compress:false}},
-    'COFFEE': {Compiler: CompilerCoffee, Opts:{Shebang: null, Compress: false}},
-    'LESS': {Compiler: CompilerLESS, Opts:{Compress: false}},
-    'CSS': {Compiler: CompilerCSS, Opts:{Compress: false}}
-  };
+class Compiler{
+  static Init():void{
+    CompilerJS = new (CompilerJS(Compiler));
+    CompilerCoffee = new (CompilerCoffee(Compiler));
+    CompilerLESS = new (CompilerLESS(Compiler));
+    CompilerCSS = new (CompilerCSS(Compiler));
+    Compiler.Map = {
+      'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
+      'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
+      'TAG': {Compiler: CompilerJS, Opts:{Compiler:'Riot', Shebang: null, Compress:false}},
+      'COFFEE': {Compiler: CompilerCoffee, Opts:{Shebang: null, Compress: false}},
+      'LESS': {Compiler: CompilerLESS, Opts:{Compress: false}},
+      'CSS': {Compiler: CompilerCSS, Opts:{Compress: false}}
+    };
+  }
+  static Map:Object = {};
   static Compile(SourceFile:String, TargetFile:String, SourceMap:String):Promise{
     global.uc_compiler_debug("Compiler::Compile "+SourceFile);
     return new Promise(function(resolve,reject){
@@ -64,3 +71,5 @@ export class Compiler{
     });
   }
 }
+Compiler.Init();
+module.exports = {Compiler};
