@@ -33,6 +33,7 @@ module.exports = function(Compiler){
         {
           Tags: ['Compiler-Include'],
           Callback: function(Info,Opts,Content,Line,Index,FileDir):Promise{
+            Opts.IncludedFiles.push(H.ABSPath(Info[2],FileDir));
             return new Promise(function(Resolve,Reject){
               Compiler.Compile(H.ABSPath(Info[2],FileDir)).then(function(Result){
                 Resolve(Result.Content);

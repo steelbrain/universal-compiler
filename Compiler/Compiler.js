@@ -41,6 +41,7 @@ class Compiler{
         Opts = H.Clone(Compiler.Map[Extension].Opts);
         Opts.TargetFile = TargetFile || null;
         Opts.SourceMap = SourceMap || null;
+        Opts.IncludedFiles = [];
         global.uc_compiler_debug("Compiler::Compile Pre-Process");
         Compiler.Map[Extension].Compiler.Process(SourceFile, Opts).then(function(Result){
           global.uc_compiler_debug("Compiler::Compile Continuing");
