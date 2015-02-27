@@ -33,19 +33,20 @@ module.exports = function (Compiler) {
     _prototypeProperties(CompilerLESS, null, {
       Process: {
         value: function Process(FilePath, Opts) {
-          return new Promise((function (Resolve, Reject) {
-            H.FileRead(FilePath).then((function (Content) {
-              this.Parse(FilePath, Content, Opts).then((function (Parsed) {
+          var Me = this;
+          return new Promise(function (Resolve, Reject) {
+            H.FileRead(FilePath).then(function (Content) {
+              Me.Parse(FilePath, Content, Opts).then(function (Parsed) {
                 var ToReturn = { Content: Parsed.Content, SourceMap: "", Opts: Parsed.Opts };
-                this.ProcessLESS(FilePath, ToReturn, Parsed).then((function () {
+                Me.ProcessLESS(FilePath, ToReturn, Parsed).then(function () {
                   if (Opts.Compress) {
-                    this.ProcessUglify(FilePath, ToReturn, Parsed);
+                    Me.ProcessUglify(FilePath, ToReturn, Parsed);
                   }
                   Resolve(ToReturn);
-                }).bind(this));
-              }).bind(this), Reject);
-            }).bind(this), Reject);
-          }).bind(this));
+                });
+              }, Reject);
+            }, Reject);
+          });
         },
         writable: true,
         configurable: true

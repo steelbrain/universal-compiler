@@ -14,17 +14,18 @@ module.exports = function(Compiler){
       Tags:[]
     };
     Process(FilePath:String, Opts:Object):Promise{
+      var Me = this;
       return new Promise(function(Resolve,Reject){
         H.FileRead(FilePath).then(function(Content){
-          this.Parse(FilePath,Content,Opts).then(function(Parsed){
+          Me.Parse(FilePath,Content,Opts).then(function(Parsed){
             var ToReturn = {Content: Parsed.Content, SourceMap: '', Opts: Parsed.Opts};
             if(Opts.Compress){
-              this.ProcessUglify(FilePath, ToReturn, Parsed);
+              Me.ProcessUglify(FilePath, ToReturn, Parsed);
             }
             Resolve(ToReturn);
-          }.bind(this),Reject);
-        }.bind(this),Reject);
-      }.bind(this));
+          },Reject);
+        },Reject);
+      });
     }
     ProcessUglify(FilePath, ToReturn, {Opts,Content}){
       UglifyCSS = UglifyCSS || new(require('clean-css'))({sourceMap:true});

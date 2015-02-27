@@ -15,19 +15,20 @@ module.exports = function(Compiler){
       Tags:[]
     };
     Process(FilePath:String, Opts:Object):Promise{
+      var Me = this;
       return new Promise(function(Resolve,Reject){
         H.FileRead(FilePath).then(function(Content){
-          this.Parse(FilePath,Content,Opts).then(function(Parsed){
+          Me.Parse(FilePath,Content,Opts).then(function(Parsed){
             var ToReturn = {Content: Parsed.Content, SourceMap: '', Opts: Parsed.Opts};
-            this.ProcessLESS(FilePath, ToReturn, Parsed).then(function(){
+            Me.ProcessLESS(FilePath, ToReturn, Parsed).then(function(){
               if(Opts.Compress){
-                this.ProcessUglify(FilePath, ToReturn, Parsed);
+                Me.ProcessUglify(FilePath, ToReturn, Parsed);
               }
               Resolve(ToReturn);
-            }.bind(this));
-          }.bind(this),Reject);
-        }.bind(this),Reject);
-      }.bind(this));
+            });
+          },Reject);
+        },Reject);
+      });
     }
     ProcessLESS(FilePath, ToReturn, {Opts,Content}):Promise{
       return new Promise(function(Resolve,Reject){

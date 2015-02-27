@@ -32,17 +32,18 @@ module.exports = function (Compiler) {
     _prototypeProperties(CompilerCSS, null, {
       Process: {
         value: function Process(FilePath, Opts) {
-          return new Promise((function (Resolve, Reject) {
-            H.FileRead(FilePath).then((function (Content) {
-              this.Parse(FilePath, Content, Opts).then((function (Parsed) {
+          var Me = this;
+          return new Promise(function (Resolve, Reject) {
+            H.FileRead(FilePath).then(function (Content) {
+              Me.Parse(FilePath, Content, Opts).then(function (Parsed) {
                 var ToReturn = { Content: Parsed.Content, SourceMap: "", Opts: Parsed.Opts };
                 if (Opts.Compress) {
-                  this.ProcessUglify(FilePath, ToReturn, Parsed);
+                  Me.ProcessUglify(FilePath, ToReturn, Parsed);
                 }
                 Resolve(ToReturn);
-              }).bind(this), Reject);
-            }).bind(this), Reject);
-          }).bind(this));
+              }, Reject);
+            }, Reject);
+          });
         },
         writable: true,
         configurable: true
