@@ -12,38 +12,13 @@ module.exports = function (Compiler) {
       LESS = null,
       H = require("../H"),
       Path = require("path"),
-      CompilerBase = require("../Abstract/Compiler-Base").CompilerBase;
+      CompilerBase = require("../Abstract/Compiler-Base")(Compiler);
 
   var CompilerLESS = (function (CompilerBase) {
     function CompilerLESS() {
       this.Map = {
         Comments: ["//", "/*"],
-        Tags: [{
-          Tags: ["Compiler-Output"],
-          Callback: function Callback(Info, Opts, Content, Line, Index, FileDir) {
-            Opts.TargetFile = H.ABSPath(Info[2], FileDir);
-          }
-        }, {
-          Tags: ["Compiler-Compress"],
-          Callback: function Callback(Info, Opts) {
-            Opts.Compress = Info[2] === "true";
-          }
-        }, {
-          Tags: ["Compiler-Sourcemap", "Compiler-SourceMap"],
-          Callback: function Callback(Info, Opts, Content, Line, Index, FileDir) {
-            Opts.SourceMap = H.ABSPath(Info[2], FileDir);
-          }
-        }, {
-          Tags: ["Compiler-Include"],
-          Callback: function Callback(Info, Opts, Content, Line, Index, FileDir) {
-            Opts.IncludedFiles.push(H.ABSPath(Info[2], FileDir));
-            return new Promise(function (Resolve, Reject) {
-              Compiler.Compile(H.ABSPath(Info[2], FileDir)).then(function (Result) {
-                Resolve(Result.Content);
-              }, Reject);
-            });
-          }
-        }]
+        Tags: []
       };
 
       _classCallCheck(this, CompilerLESS);

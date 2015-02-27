@@ -7,37 +7,20 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 module.exports = function (Compiler) {
-  var Promise = require("a-promise");
-  var UglifyJS = null;
-  var Babel = null;
-  var Riot = null;
-  var ReactTools = null;
-  var H = require("../H");
-  var Path = require("path");
-  var _require = require("../Abstract/Compiler-Base");
-
-  var CompilerBase = _require.CompilerBase;
+  var Promise = require("a-promise"),
+      UglifyJS = null,
+      Babel = null,
+      Riot = null,
+      ReactTools = null,
+      H = require("../H"),
+      Path = require("path"),
+      CompilerBase = require("../Abstract/Compiler-Base")(Compiler);
 
   var CompilerJS = (function (CompilerBase) {
     function CompilerJS() {
       this.Map = {
         Comments: ["/*", "//"],
         Tags: [{
-          Tags: ["Compiler-Output"],
-          Callback: function Callback(Info, Opts, Content, Line, Index, FileDir) {
-            Opts.TargetFile = H.ABSPath(Info[2], FileDir);
-          }
-        }, {
-          Tags: ["Compiler-Sourcemap", "Compiler-SourceMap"],
-          Callback: function Callback(Info, Opts, Content, Line, Index, FileDir) {
-            Opts.SourceMap = H.ABSPath(Info[2], FileDir);
-          }
-        }, {
-          Tags: ["Compiler-Compress"],
-          Callback: function Callback(Info, Opts) {
-            Opts.Compress = Info[2] === "true";
-          }
-        }, {
           Tags: ["Compiler-Name"],
           Callback: function Callback(Info, Opts) {
             Info[2] = Info[2].toUpperCase();
@@ -48,16 +31,6 @@ module.exports = function (Compiler) {
             } else if (Info[2] === "RIOT") {
               Opts.Compiler = "Riot";
             }
-          }
-        }, {
-          Tags: ["Compiler-Include"],
-          Callback: function Callback(Info, Opts, Content, Line, Index, FileDir) {
-            Opts.IncludedFiles.push(H.ABSPath(Info[2], FileDir));
-            return new Promise(function (Resolve, Reject) {
-              Compiler.Compile(H.ABSPath(Info[2], FileDir)).then(function (Result) {
-                Resolve(Result.Content);
-              }, Reject);
-            });
           }
         }]
       };

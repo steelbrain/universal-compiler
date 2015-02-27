@@ -7,41 +7,11 @@ module.exports = function(Compiler){
     UglifyCSS = null,
     H = require('../H'),
     Path = require('path'),
-    CompilerBase = require('../Abstract/Compiler-Base').CompilerBase;
+    CompilerBase = (require('../Abstract/Compiler-Base'))(Compiler);
   class CompilerCSS extends CompilerBase{
     Map:Object = {
       Comments: ['/*'],
-      Tags:[
-        {
-          Tags: ['Compiler-Output'],
-          Callback: function(Info,Opts,Content,Line,Index,FileDir):void{
-            Opts.TargetFile = H.ABSPath(Info[2],FileDir);
-          }
-        },
-        {
-          Tags: ['Compiler-Compress'],
-          Callback: function(Info,Opts):void{
-            Opts.Compress = Info[2] === 'true';
-          }
-        },
-        {
-          Tags: ['Compiler-SourceMap', 'Compiler-Sourcemap'],
-          Callback: function(Info,Opts,Content,Line,Index,FileDir):void{
-            Opts.SourceMap = H.ABSPath(Info[2],FileDir);
-          }
-        },
-        {
-          Tags: ['Compiler-Include'],
-          Callback: function(Info,Opts,Content,Line,Index,FileDir):Promise{
-            Opts.IncludedFiles.push(H.ABSPath(Info[2],FileDir));
-            return new Promise(function(Resolve,Reject){
-              Compiler.Compile(H.ABSPath(Info[2],FileDir)).then(function(Result){
-                Resolve(Result.Content);
-              },Reject);
-            });
-          }
-        }
-      ]
+      Tags:[]
     };
     Process(FilePath:String, Opts:Object):Promise{
       return new Promise(function(Resolve,Reject){
