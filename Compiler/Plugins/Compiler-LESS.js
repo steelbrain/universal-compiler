@@ -32,7 +32,7 @@ module.exports = function(Compiler){
           }
         },
         {
-          Tags: ['Compiler-Append'],
+          Tags: ['Compiler-Include'],
           Callback: function(Info,Opts,Content,Line,Index,FileDir):Promise{
             Opts.IncludedFiles.push(H.ABSPath(Info[2],FileDir));
             return new Promise(function(Resolve,Reject){

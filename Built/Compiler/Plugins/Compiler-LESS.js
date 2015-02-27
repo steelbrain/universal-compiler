@@ -34,7 +34,7 @@ module.exports = function (Compiler) {
             Opts.SourceMap = H.ABSPath(Info[2], FileDir);
           }
         }, {
-          Tags: ["Compiler-Append"],
+          Tags: ["Compiler-Include"],
           Callback: function Callback(Info, Opts, Content, Line, Index, FileDir) {
             Opts.IncludedFiles.push(H.ABSPath(Info[2], FileDir));
             return new Promise(function (Resolve, Reject) {
