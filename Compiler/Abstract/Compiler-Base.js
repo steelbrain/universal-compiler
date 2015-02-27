@@ -14,7 +14,8 @@ export class CompilerBase{
       var
         Valid = false,
         Info = null,
-        Result = null;
+        Result = null,
+        Tag = null;
       Line = Line.trim();
       this.Map.Comments.forEach(function(Comment){
         if(Line.substr(0,Comment.length) === Comment){
@@ -25,10 +26,18 @@ export class CompilerBase{
         return Resolve();
       }
       Info = CompilerBase.RegexLineInfo.exec(Line);
-      if(!Info || Info.length !== 3 || !this.Map.Tags.hasOwnProperty(Info[1])){
+      if(!Info || Info.length !== 3){
         return Resolve();
       }
-      Result = this.Map.Tags[Info[1]](Info,Opts,Content,Line,Index,FileDir,FilePath);
+      this.Map.Tags.forEach(function(TagEntry){
+        if(TagEntry.Tags.indexOf(Info[1]) !== -1){
+          Tag = TagEntry;
+        }
+      });
+      if(Tag === null){
+        return Resolve();
+      }
+      Result = Tag.Callback(Info,Opts,Content,Line,Index,FileDir,FilePath);
       if(typeof Result !== 'undefined'){
         if(Result.then){
           Result.then(function(Result){

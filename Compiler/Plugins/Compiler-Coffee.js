@@ -12,24 +12,36 @@ module.exports = function(Compiler){
   class CompilerCoffee extends CompilerBase{
     Map:Object = {
       Comments: ['#'],
-      Tags:{
-        'Compiler-Output':function(Info,Opts,Content,Line,Index,FileDir):void{
-          Opts.TargetFile = H.ABSPath(Info[2],FileDir);
+      Tags:[
+        {
+          Tags: ['Compiler-Output'],
+          Callback: function(Info,Opts,Content,Line,Index,FileDir):void{
+            Opts.TargetFile = H.ABSPath(Info[2],FileDir);
+          }
         },
-        'Compiler-SourceMap': function(Info,Opts,Content,Line,Index,FileDir):void{
-          Opts.SourceMap = H.ABSPath(Info[2],FileDir);
+        {
+          Tags: ['Compiler-Sourcemap', 'Compiler-SourceMap'],
+          Callback: function(Info,Opts,Content,Line,Index,FileDir):void{
+            Opts.SourceMap = H.ABSPath(Info[2],FileDir);
+          }
         },
-        'Compiler-Compress':function(Info,Opts):void{
-          Opts.Compress = Info[2] === 'true';
+        {
+          Tags: ['Compiler-Compress'],
+          Callback: function(Info,Opts):void{
+            Opts.Compress = Info[2] === 'true';
+          }
         },
-        'Compiler-Append':function(Info,Opts,Content,Line,Index,FileDir):Promise{
-          return new Promise(function(Resolve,Reject){
-            Compiler.Compile(H.ABSPath(Info[2],FileDir)).then(function(Result){
-              Resolve(Result.Content);
-            },Reject);
-          });
+        {
+          Tags: ['Compiler-Include'],
+          Callback: function(Info,Opts,Content,Line,Index,FileDir):Promise{
+            return new Promise(function(Resolve,Reject){
+              Compiler.Compile(H.ABSPath(Info[2],FileDir)).then(function(Result){
+                Resolve(Result.Content);
+              },Reject);
+            });
+          }
         }
-      }
+      ]
     };
     Process(FilePath:String, Opts:Object):Promise{
       return new Promise(function(Resolve,Reject){

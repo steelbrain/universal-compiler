@@ -4,25 +4,26 @@ var _prototypeProperties = function (child, staticProps, instanceProps) { if (st
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-
-
 var Path = require("path"),
     FS = require("fs"),
     Promise = require("a-promise"),
     H = require("../H");
+
 var CompilerBase = exports.CompilerBase = (function () {
   function CompilerBase() {
     _classCallCheck(this, CompilerBase);
   }
 
   CompilerBase.RegexLineInfo = /@([a-zA-z1-9-]*) "(.*)"/;
+
   _prototypeProperties(CompilerBase, null, {
     ParseLine: {
-      value: function (FilePath, FileDir, Content, Opts, Line, Index) {
+      value: function ParseLine(FilePath, FileDir, Content, Opts, Line, Index) {
         return new Promise((function (Resolve, Reject) {
           var Valid = false,
               Info = null,
-              Result = null;
+              Result = null,
+              Tag = null;
           Line = Line.trim();
           this.Map.Comments.forEach(function (Comment) {
             if (Line.substr(0, Comment.length) === Comment) {
@@ -33,10 +34,18 @@ var CompilerBase = exports.CompilerBase = (function () {
             return Resolve();
           }
           Info = CompilerBase.RegexLineInfo.exec(Line);
-          if (!Info || Info.length !== 3 || !this.Map.Tags.hasOwnProperty(Info[1])) {
+          if (!Info || Info.length !== 3) {
             return Resolve();
           }
-          Result = this.Map.Tags[Info[1]](Info, Opts, Content, Line, Index, FileDir, FilePath);
+          this.Map.Tags.forEach(function (TagEntry) {
+            if (TagEntry.Tags.indexOf(Info[1]) !== -1) {
+              Tag = TagEntry;
+            }
+          });
+          if (Tag === null) {
+            return Resolve();
+          }
+          Result = Tag.Callback(Info, Opts, Content, Line, Index, FileDir, FilePath);
           if (typeof Result !== "undefined") {
             if (Result.then) {
               Result.then(function (Result) {
@@ -57,7 +66,7 @@ var CompilerBase = exports.CompilerBase = (function () {
       configurable: true
     },
     Parse: {
-      value: function (FilePath, Content, Opts) {
+      value: function Parse(FilePath, Content, Opts) {
         Content = Content.split(/\r\n|\r|\n/);
         return new Promise((function (Resolve, Reject) {
           if (!Content.length) {
@@ -86,6 +95,7 @@ var CompilerBase = exports.CompilerBase = (function () {
 
   return CompilerBase;
 })();
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });

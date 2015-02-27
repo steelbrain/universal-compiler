@@ -17,24 +17,31 @@ module.exports = function (Compiler) {
     function CompilerCSS() {
       this.Map = {
         Comments: ["/*"],
-        Tags: {
-          "Compiler-Output": function (Info, Opts, Content, Line, Index, FileDir) {
+        Tags: [{
+          Tags: ["Compiler-Output"],
+          Callback: function Callback(Info, Opts, Content, Line, Index, FileDir) {
             Opts.TargetFile = H.ABSPath(Info[2], FileDir);
-          },
-          "Compiler-Compress": function (Info, Opts) {
+          }
+        }, {
+          Tags: ["Compiler-Compress"],
+          Callback: function Callback(Info, Opts) {
             Opts.Compress = Info[2] === "true";
-          },
-          "Compiler-SourceMap": function (Info, Opts, Content, Line, Index, FileDir) {
+          }
+        }, {
+          Tags: ["Compiler-SourceMap", "Compiler-Sourcemap"],
+          Callback: function Callback(Info, Opts, Content, Line, Index, FileDir) {
             Opts.SourceMap = H.ABSPath(Info[2], FileDir);
-          },
-          "Compiler-Append": function (Info, Opts, Content, Line, Index, FileDir) {
+          }
+        }, {
+          Tags: ["Compiler-Include"],
+          Callback: function Callback(Info, Opts, Content, Line, Index, FileDir) {
             return new Promise(function (Resolve, Reject) {
               Compiler.Compile(H.ABSPath(Info[2], FileDir)).then(function (Result) {
                 Resolve(Result.Content);
               }, Reject);
             });
           }
-        }
+        }]
       };
 
       _classCallCheck(this, CompilerCSS);
