@@ -16,9 +16,11 @@ class Watcher extends EventEmitter{
   Dir:String;
   Manifest:Object;
   ManifestPath:String;
+  Chokidar:Chokidar;
   constructor(Dir:String){
     global.uc_watcher_debug("Watcher::__construct");
     var Me = this;
+    this.Chokidar = Chokidar;
     this.Dir = FS.realpathSync(Dir);
 
     Me.ManifestPath = `${Me.Dir}${Path.sep}DeProc.json`;
