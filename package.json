@@ -1,6 +1,6 @@
 {
   "name": "universal-compiler",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A universal Compiler for NodeJS",
   "main": "Exec/Exec.js",
   "scripts": {
