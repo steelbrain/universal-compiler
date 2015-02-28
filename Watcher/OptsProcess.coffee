@@ -27,9 +27,13 @@ module.exports =
         ReturnVal = true
       global.uc_watcher_debug "OptsProcess::Default Return Value #{ReturnVal}"
       Resolve ReturnVal
-  JS:->
+  JS:(ProjectDir, FileInfo, Opts, ResultOpts)->
+    ReturnVal = false
     return new Promise (Resolve)->
-      Resolve false
+      if ResultOpts.Compiler isnt Opts.Compiler
+        Opts.Compiler = ResultOpts.Compiler
+        ReturnVal = true
+      Resolve ReturnVal
   CSS:->
     return new Promise (Resolve)->
       Resolve false
