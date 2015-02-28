@@ -8,6 +8,10 @@ Promise = require 'a-promise'
 module.exports = (WatcherControl)->
   class H
     @ExcludedFiles = ['.git', '.idea']
+    @FileDir:(FilePath)->
+      FilePath = FilePath.split(Path.sep);
+      FilePath.pop();
+      return FilePath.join(Path.sep);
     @Clone:(Obj)->
       return Obj unless Obj isnt null and typeof Obj is 'object'
       New = Obj.constructor()
@@ -22,7 +26,7 @@ module.exports = (WatcherControl)->
       Ext = NameChunks.pop().toUpperCase()
       return unless WatcherControl.FileTypes.hasOwnProperty Ext
       ToReturn = Path: FullPath, Name:Name, Ext:Ext, Config: WatcherControl.FileTypes[Ext]
-      ToReturn.Config.Output = NameChunks.join('.') + '-dist.' + WatcherControl.FileTypesProcessedExt[Ext]
+      ToReturn.Config.Output = H.FileDir(FullPath) + Path.sep + NameChunks.join('.') + '-dist.' + WatcherControl.FileTypesProcessedExt[Ext]
       return ToReturn
     @Manifest:(Dir)->
       return new Promise (resolve)->
