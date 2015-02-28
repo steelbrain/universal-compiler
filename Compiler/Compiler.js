@@ -28,7 +28,7 @@ class Compiler{
   static Map:Object = {};
   static Compile(SourceFile:String, TargetFile:String, SourceMap:String):Promise{
     global.uc_compiler_debug("Compiler::Compile "+SourceFile);
-    return new Promise(function(resolve,reject){
+    return new Promise(function(Resolve,Reject){
       H.FileExists(SourceFile).then(function(){
         global.uc_compiler_debug("Compiler::Compile Exists");
         var
@@ -36,7 +36,7 @@ class Compiler{
           Opts = null;
         if(!Compiler.Map.hasOwnProperty(Extension)){
           global.uc_compiler_debug("Compiler::Compile Unrecognized");
-          return reject('The given file type is not recognized');
+          return Reject('The given file type is not recognized');
         }
         Opts = H.Clone(Compiler.Map[Extension].Opts);
         Opts.TargetFile = TargetFile || null;
@@ -48,26 +48,28 @@ class Compiler{
           Opts = Result.Opts;
           if( !Opts.TargetFile ){
             global.uc_compiler_debug("Compiler::Compile Return Processed");
-            return resolve(Result);
+            return Resolve(Result);
           }
           global.uc_compiler_debug("Compiler::Compile Write Processed");
           global.uc_compiler_debug("Compiler::Compile Target " + Opts.TargetFile);
           FS.writeFile(Opts.TargetFile,Result.Content,function(Error){
             if(Error){
-              return reject(Error);
+              return Reject(Error);
             }
             if( Opts.SourceMap ){
               global.uc_compiler_debug("Compiler::Compile Write SourceMap");
               global.uc_compiler_debug("Compiler::Compile SourceMap " + Opts.SourceMap);
-              FS.writeFile(Opts.SourceMap,Result.SourceMap, resolve);
+              FS.writeFile(Opts.SourceMap,Result.SourceMap, function(){
+                Resolve(Result);
+              });
             } else {
-              resolve();
+              Resolve(Result);
             }
           })
-        },reject);
+        },Reject);
       },function(){
         global.uc_compiler_debug("Compiler::Compile doesn't exist");
-        return reject(`Source file ${SourceFile} doesn't exist`);
+        return Reject(`Source file ${SourceFile} doesn't exist`);
       });
     });
   }
