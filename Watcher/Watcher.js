@@ -50,7 +50,7 @@ class Watcher extends EventEmitter{
     for(var Index in this.Manifest.Items.Info){
       if(this.Manifest.Items.Info.hasOwnProperty(Index)){
         if(this.Manifest.Items.Info[Index].Config.Watch){
-          Chokidar.add(this.Manifest.Items.Info[Index].Path);
+          Chokidar.add(`${this.Dir}/${this.Manifest.Items.Info[Index].Path}`);
         }
       }
     }
@@ -58,9 +58,10 @@ class Watcher extends EventEmitter{
   OnChange(FilePath:String):void{
     global.uc_watcher_debug("Watcher::OnChange `" + FilePath + "`");
     var
-      MyInfo = this.Manifest.Items.Info[FilePath],
+      RelativeFilePath = FilePath.substr(this.Dir.length + 1),
+      MyInfo = this.Manifest.Items.Info[RelativeFilePath],
       Temp = null;
-    Compiler.Compile(FilePath, {SourceMap: this.Manifest.Items.Info[FilePath].SourceMap}).then(function(Result){
+    Compiler.Compile(FilePath, {SourceMap: MyInfo.SourceMap}).then(function(Result){
       global.uc_watcher_debug("Watcher::OnChange Compiled `" + FilePath + "`");
       if(Result.Opts.TargetFile !== null &&
         MyInfo.Config.Output !== Result.Opts.TargetFile){
@@ -84,11 +85,11 @@ class Watcher extends EventEmitter{
           this.WriteManifest();
         }
       }
-      FS.writeFile(MyInfo.Config.Output, Result.Content);
-      global.uc_watcher_debug("Watcher::OnChange Wrote `" + FilePath + "` to `" + MyInfo.Config.Output + "`");
+      FS.writeFile(`${this.Dir}/${MyInfo.Config.Output}`, Result.Content);
+      global.uc_watcher_debug(`Watcher::OnChange Wrote ${RelativeFilePath} to ${this.Dir}/${MyInfo.Config.Output}`);
       if(MyInfo.Config.SourceMap !== null){
-        FS.writeFile(MyInfo.Config.SourceMap, Result.SourceMap);
-        global.uc_watcher_debug("Watcher::OnChange Wrote `" + FilePath + "` SourceMap to `" + MyInfo.Config.SourceMap + "`");
+        FS.writeFile(`${this.Dir}/${MyInfo.Config.SourceMap}`, Result.SourceMap);
+        global.uc_watcher_debug(`Watcher::OnChange Wrote ${RelativeFilePath} SourceMap to ${this.Dir}/${MyInfo.Config.SourceMap}`);
       }
     }.bind(this));
   }
