@@ -2,6 +2,8 @@ Universal-Compiler
 =================
 Universal compiler is a compiler for your Web Assets, Period.
 
+__Note:__ This is a work in progress and I change API every day, So Please don't use it until it's stable.
+
 #### Installation
 ```
 npm install universal-compiler
