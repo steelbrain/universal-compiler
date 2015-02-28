@@ -19,13 +19,21 @@ class H{
       RelativePath.join(Path.sep) + Path.sep + Path2.join(Path.sep) :
       Path2.join(Path.sep);
   }
-  static Clone(obj) {
-    if (null == obj || "object" != typeof obj) return obj;
-    var copy = obj.constructor();
-    for (var attr in obj) {
-      if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+  static Clone(Obj) {
+    var Key, New, Value;
+    if (!(Obj !== null && typeof Obj === 'object')) {
+      return Obj;
     }
-    return copy;
+    New = Obj.constructor();
+    for (Key of Obj){
+      Value = Obj[Key];
+      if (typeof Value === 'object') {
+        New[Key] = H.Clone(Value);
+      } else {
+        New[Key] = Value;
+      }
+    }
+    return New;
   }
   static ABSPath(FilePath:String, FileDir:String):String{
     if (FilePath.substr(0, 1) !== Path.sep &&
