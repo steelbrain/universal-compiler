@@ -11,14 +11,14 @@ module.exports =
       if ResultOpts.TargetFile isnt null and ResultOpts.TargetFile isnt Opts.Output
         if !FS.existsSync ResultOpts.TargetFile
           FS.writeFileSync ResultOpts.TargetFile,''
-        Temp = FS.realpathSync ResultOpts.TargetFile
+        Temp = FS.realpathSync(ResultOpts.TargetFile).substr(ProjectDir.length + 1)
         if Temp isnt Opts.Output
           Opts.Output = Temp
           ReturnVal = true
       if ResultOpts.SourceMap isnt null and ResultOpts.SourceMap isnt Opts.Output
         if !FS.existsSync ResultOpts.SourceMap
           FS.writeFileSync ResultOpts.SourceMap,''
-        Temp = FS.realpathSync ResultOpts.SourceMap
+        Temp = FS.realpathSync(ResultOpts.SourceMap).substr(ProjectDir.length + 1)
         if Temp isnt Opts.SourceMap
           Opts.SourceMap = Temp
           ReturnVal = true
