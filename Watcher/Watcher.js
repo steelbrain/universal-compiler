@@ -63,7 +63,7 @@ class Watcher extends EventEmitter{
       MyInfo = this.Manifest.Items.Info[RelativeFilePath],
       Temp = null,
       Me = this;
-    Compiler.Compile(FilePath, {SourceMap: MyInfo.SourceMap}).then(function(Result){
+    Compiler.Compile(FilePath, MyInfo.Config).then(function(Result){
       global.uc_watcher_debug("Watcher::OnChange Compiler::Compile Completed for `" + FilePath + "`");
       OptsProcess.Default(Me.Dir, MyInfo, MyInfo.Config, Result.Opts).then(function(UpdateDefault){
         OptsProcess[MyInfo.Type](Me.Dir, MyInfo, MyInfo.Config, Result.Opts).then(function(UpdateSpecific){
