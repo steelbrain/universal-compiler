@@ -7,7 +7,7 @@ Promise = require 'a-promise'
 {Compiler} = require '../Compiler/Compiler'
 module.exports = (WatcherControl)->
   class H
-    @ExcludedFiles = ['.git']
+    @ExcludedFiles = ['.git', '.idea']
     @Clone:(Obj)->
       return Obj unless Obj isnt null and typeof Obj is 'object'
       New = Obj.constructor()
