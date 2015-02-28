@@ -24,7 +24,7 @@ module.exports = (WatcherControl)->
     @Manifest:(Dir)->
       return new Promise (resolve)->
         H.ScanDir(Dir).then (Items)->
-          resolve Name: Path.basename(Dir), Items: Items
+          resolve Name: Path.basename(Dir), Items: Items, Version: WatcherControl.Version
     @ScanDir: (Directory, Excluded = [])->
       return new Promise (Resolve)->
         ToReturn = Info: [], Tree: Dirs:{},Files:[]

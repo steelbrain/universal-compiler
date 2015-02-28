@@ -41,6 +41,7 @@ class Watcher extends EventEmitter{
   }
 }
 class WatcherControl{
+  static Version = '0.0.1';
   static Init(){
     global.uc_watcher_debug("WatcherControl::Init");
     WatcherH = WatcherH(WatcherControl);
