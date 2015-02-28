@@ -41,12 +41,13 @@ class Compiler{
         CompileOpts = H.Clone(Compiler.Map[Extension].Opts);
         CompileOpts.TargetFile = Opts.TargetFile || null;
         CompileOpts.SourceMap = Opts.SourceMap || null;
+        CompileOpts.Write = Boolean(Opts.Write);
         CompileOpts.IncludedFiles = [];
         global.uc_compiler_debug("Compiler::Compile Pre-Process");
         Compiler.Map[Extension].Compiler.Process(SourceFile, CompileOpts).then(function(Result){
           global.uc_compiler_debug("Compiler::Compile Continuing");
           CompileOpts = Result.Opts;
-          if( !CompileOpts.TargetFile ){
+          if(!CompileOpts.Write || !CompileOpts.TargetFile){
             global.uc_compiler_debug("Compiler::Compile Return Processed");
             return Resolve(Result);
           }
