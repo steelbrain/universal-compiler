@@ -7,7 +7,7 @@ Promise = require 'a-promise'
 {Compiler} = require '../Compiler/Compiler'
 module.exports = (WatcherControl)->
   class H
-    @ExcludedFiles = ['.git', '.idea']
+    @ExcludedFiles = ['.git', '.idea', 'Built', 'Build', 'build', 'built']
     @FileDir:(FilePath)->
       FilePath = FilePath.split(Path.sep);
       FilePath.pop();
