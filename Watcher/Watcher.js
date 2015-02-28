@@ -42,30 +42,47 @@ class Watcher extends EventEmitter{
     Chokidar.on('change', this.OnChange.bind(this));
   }
   WriteManifest():void{
+    global.uc_watcher_debug("Watcher::WriteManifest");
     FS.writeFile(this.ManifestPath,JSON.stringify(this.Manifest));
   }
   Watch():void{
     global.uc_watcher_debug("Watcher::Watch Watching files");
     for(var Index in this.Manifest.Items.Info){
       if(this.Manifest.Items.Info.hasOwnProperty(Index)){
-        Chokidar.add(this.Manifest.Items.Info[Index].Path);
+        if(this.Manifest.Items.Info[Index].Config.Watch){
+          Chokidar.add(this.Manifest.Items.Info[Index].Path);
+        }
       }
     }
   }
   OnChange(FilePath:String):void{
     global.uc_watcher_debug("Watcher::OnChange `" + FilePath + "`");
-    var MyInfo = this.Manifest.Items.Info[FilePath];
+    var
+      MyInfo = this.Manifest.Items.Info[FilePath],
+      Temp = null;
     Compiler.Compile(FilePath, {SourceMap: this.Manifest.Items.Info[FilePath].SourceMap}).then(function(Result){
       global.uc_watcher_debug("Watcher::OnChange Compiled `" + FilePath + "`");
       if(Result.Opts.TargetFile !== null &&
         MyInfo.Config.Output !== Result.Opts.TargetFile){
-        MyInfo.Config.Output = Result.Opts.TargetFile;
-        this.WriteManifest();
+        if(!FS.existsSync(Result.Opts.TargetFile)){
+          FS.writeFileSync(Result.Opts.TargetFile,'');
+        }
+        Temp = FS.realpathSync(Result.Opts.TargetFile);
+        if(Temp !== MyInfo.Config.Output){
+          MyInfo.Config.Output = Temp;
+          this.WriteManifest();
+        }
       }
       if(Result.Opts.SourceMap !== null &&
         MyInfo.Config.SourceMap !== Result.Opts.SourceMap){
-        MyInfo.Config.SourceMap = Result.Opts.SourceMap;
-        this.WriteManifest();
+        if(!FS.existsSync(Result.Opts.SourceMap)){
+          FS.writeFileSync(Result.Opts.SourceMap,'');
+        }
+        Temp = FS.realpathSync(Result.Opts.SourceMap);
+        if(Temp !== MyInfo.Config.SourceMap){
+          MyInfo.Config.SourceMap = Temp;
+          this.WriteManifest();
+        }
       }
       FS.writeFile(MyInfo.Config.Output, Result.Content);
       global.uc_watcher_debug("Watcher::OnChange Wrote `" + FilePath + "` to `" + MyInfo.Config.Output + "`");
