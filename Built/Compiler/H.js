@@ -31,14 +31,23 @@ var H = (function () {
       configurable: true
     },
     Clone: {
-      value: function Clone(obj) {
-        if (null == obj || "object" != typeof obj) {
-          return obj;
-        }var copy = obj.constructor();
-        for (var attr in obj) {
-          if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+      value: function Clone(Obj) {
+        var Key, New, Value;
+        if (!(Obj !== null && typeof Obj === "object")) {
+          return Obj;
         }
-        return copy;
+        New = Obj.constructor();
+        for (Key in Obj){
+          if(Obj.hasOwnProperty(Key)){
+            Value = Obj[Key];
+            if (typeof Value === 'object') {
+              New[Key] = H.Clone(Value);
+            } else {
+              New[Key] = Value;
+            }
+          }
+        }
+        return New;
       },
       writable: true,
       configurable: true

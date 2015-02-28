@@ -40,47 +40,50 @@ var Compiler = (function () {
       configurable: true
     },
     Compile: {
-      value: function Compile(SourceFile, TargetFile, SourceMap) {
+      value: function Compile(SourceFile, Opts) {
         global.uc_compiler_debug("Compiler::Compile " + SourceFile);
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (Resolve, Reject) {
           H.FileExists(SourceFile).then(function () {
             global.uc_compiler_debug("Compiler::Compile Exists");
             var Extension = SourceFile.split(".").pop().toUpperCase(),
-                Opts = null;
+                CompileOpts = null;
             if (!Compiler.Map.hasOwnProperty(Extension)) {
               global.uc_compiler_debug("Compiler::Compile Unrecognized");
-              return reject("The given file type is not recognized");
+              return Reject("The given file type is not recognized");
             }
-            Opts = H.Clone(Compiler.Map[Extension].Opts);
-            Opts.TargetFile = TargetFile || null;
-            Opts.SourceMap = SourceMap || null;
-            Opts.IncludedFiles = [];
+            CompileOpts = H.Clone(Compiler.Map[Extension].Opts);
+            CompileOpts.TargetFile = Opts.TargetFile || null;
+            CompileOpts.SourceMap = Opts.SourceMap || null;
+            CompileOpts.Write = Boolean(Opts.Write);
+            CompileOpts.IncludedFiles = [];
             global.uc_compiler_debug("Compiler::Compile Pre-Process");
-            Compiler.Map[Extension].Compiler.Process(SourceFile, Opts).then(function (Result) {
+            Compiler.Map[Extension].Compiler.Process(SourceFile, CompileOpts).then(function (Result) {
               global.uc_compiler_debug("Compiler::Compile Continuing");
-              Opts = Result.Opts;
-              if (!Opts.TargetFile) {
+              CompileOpts = Result.Opts;
+              if (!CompileOpts.Write || !CompileOpts.TargetFile) {
                 global.uc_compiler_debug("Compiler::Compile Return Processed");
-                return resolve(Result);
+                return Resolve(Result);
               }
               global.uc_compiler_debug("Compiler::Compile Write Processed");
-              global.uc_compiler_debug("Compiler::Compile Target " + Opts.TargetFile);
-              FS.writeFile(Opts.TargetFile, Result.Content, function (Error) {
+              global.uc_compiler_debug("Compiler::Compile Target " + CompileOpts.TargetFile);
+              FS.writeFile(CompileOpts.TargetFile, Result.Content, function (Error) {
                 if (Error) {
-                  return reject(Error);
+                  return Reject(Error);
                 }
-                if (Opts.SourceMap) {
+                if (CompileOpts.SourceMap) {
                   global.uc_compiler_debug("Compiler::Compile Write SourceMap");
-                  global.uc_compiler_debug("Compiler::Compile SourceMap " + Opts.SourceMap);
-                  FS.writeFile(Opts.SourceMap, Result.SourceMap, resolve);
+                  global.uc_compiler_debug("Compiler::Compile SourceMap " + CompileOpts.SourceMap);
+                  FS.writeFile(CompileOpts.SourceMap, Result.SourceMap, function () {
+                    Resolve(Result);
+                  });
                 } else {
-                  resolve();
+                  Resolve(Result);
                 }
               });
-            }, reject);
+            }, Reject);
           }, function () {
             global.uc_compiler_debug("Compiler::Compile doesn't exist");
-            return reject("Source file " + SourceFile + " doesn't exist");
+            return Reject("Source file " + SourceFile + " doesn't exist");
           });
         });
       },
