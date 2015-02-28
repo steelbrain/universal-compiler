@@ -32,8 +32,8 @@ class Watcher extends EventEmitter{
       global.uc_watcher_debug("Watcher::__construct Manifest Doesn't Exist");
       WatcherH.Manifest(Dir).then(function(Manifest){
         global.uc_watcher_debug("Watcher::__construct Writing Manifest");
-        FS.writeFile(Me.ManifestPath,JSON.stringify(Manifest));
         Me.Manifest = Manifest;
+        Me.WriteManifest();
         Me.emit('Init');
       });
     });
@@ -41,17 +41,39 @@ class Watcher extends EventEmitter{
     this.on('Init',this.Watch.bind(this));
     Chokidar.on('change', this.OnChange.bind(this));
   }
+  WriteManifest():void{
+    FS.writeFile(this.ManifestPath,JSON.stringify(this.Manifest));
+  }
   Watch():void{
-    global.uc_watcher_debug("Watcher::Watch Watching " + this.Manifest.Items.Info.length + " files");
-    this.Manifest.Items.Info.forEach(function(Item){
-      Chokidar.add(Item.Path);
-    });
+    global.uc_watcher_debug("Watcher::Watch Watching files");
+    for(var Index in this.Manifest.Items.Info){
+      if(this.Manifest.Items.Info.hasOwnProperty(Index)){
+        Chokidar.add(this.Manifest.Items.Info[Index].Path);
+      }
+    }
   }
   OnChange(FilePath:String):void{
     global.uc_watcher_debug("Watcher::OnChange `" + FilePath + "`");
-    Compiler.Compile(FilePath).then(function(Result){
-      console.log(Result);
-    });
+    var MyInfo = this.Manifest.Items.Info[FilePath];
+    Compiler.Compile(FilePath, {SourceMap: this.Manifest.Items.Info[FilePath].SourceMap}).then(function(Result){
+      global.uc_watcher_debug("Watcher::OnChange Compiled `" + FilePath + "`");
+      if(Result.Opts.TargetFile !== null &&
+        MyInfo.Config.Output !== Result.Opts.TargetFile){
+        MyInfo.Config.Output = Result.Opts.TargetFile;
+        this.WriteManifest();
+      }
+      if(Result.Opts.SourceMap !== null &&
+        MyInfo.Config.SourceMap !== Result.Opts.SourceMap){
+        MyInfo.Config.SourceMap = Result.Opts.SourceMap;
+        this.WriteManifest();
+      }
+      FS.writeFile(MyInfo.Config.Output, Result.Content);
+      global.uc_watcher_debug("Watcher::OnChange Wrote `" + FilePath + "` to `" + MyInfo.Config.Output + "`");
+      if(MyInfo.Config.SourceMap !== null){
+        FS.writeFile(MyInfo.Config.SourceMap, Result.SourceMap);
+        global.uc_watcher_debug("Watcher::OnChange Wrote `" + FilePath + "` SourceMap to `" + MyInfo.Config.SourceMap + "`");
+      }
+    }.bind(this));
   }
 }
 class WatcherControl{
