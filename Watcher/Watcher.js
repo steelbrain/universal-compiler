@@ -41,6 +41,7 @@ class Watcher extends EventEmitter{
 
     this.on('Init',this.Watch.bind(this));
     Chokidar.on('change', this.OnChange.bind(this));
+    Chokidar.on('unlink', this.OnRemove.bind(this));
   }
   WriteManifest():void{
     global.uc_watcher_debug("Watcher::WriteManifest");
@@ -55,6 +56,13 @@ class Watcher extends EventEmitter{
         }
       }
     }
+  }
+  OnRemove(FilePath:String):void{
+    global.uc_watcher_debug("Watcher::OnRemove `" + FilePath + "`");
+    var RelativeFilePath = FilePath.substr(this.Dir.length + 1);
+    delete this.Manifest.Items.Info[RelativeFilePath];
+    Chokidar.unwatch(FilePath);
+    this.WriteManifest();
   }
   OnChange(FilePath:String):void{
     global.uc_watcher_debug("Watcher::OnChange `" + FilePath + "`");
