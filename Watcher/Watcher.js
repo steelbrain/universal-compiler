@@ -9,7 +9,8 @@ var
   {EventEmitter} = require('events'),
   Path = require('path'),
   FS = require('fs'),
-  Chokidar = new (require('chokidar').FSWatcher);
+  Chokidar = new (require('chokidar').FSWatcher),
+  OptsProcess = require('./OptsProcess');
 global.uc_watcher_debug = require('debug')('uc-watcher');
 class Watcher extends EventEmitter{
   Dir:String;
@@ -60,40 +61,26 @@ class Watcher extends EventEmitter{
     var
       RelativeFilePath = FilePath.substr(this.Dir.length + 1),
       MyInfo = this.Manifest.Items.Info[RelativeFilePath],
-      Temp = null;
+      Temp = null,
+      Me = this;
     Compiler.Compile(FilePath, {SourceMap: MyInfo.SourceMap}).then(function(Result){
       global.uc_watcher_debug("Watcher::OnChange Compiler::Compile Completed for `" + FilePath + "`");
-      if(Result.Opts.TargetFile !== null &&
-        MyInfo.Config.Output !== Result.Opts.TargetFile){
-        if(!FS.existsSync(Result.Opts.TargetFile)){
-          FS.writeFileSync(Result.Opts.TargetFile,'');
-        }
-        Temp = FS.realpathSync(Result.Opts.TargetFile);
-        if(Temp !== MyInfo.Config.Output){
-          MyInfo.Config.Output = Temp;
-          this.WriteManifest();
-        }
-      }
-      if(Result.Opts.SourceMap !== null &&
-        MyInfo.Config.SourceMap !== Result.Opts.SourceMap){
-        if(!FS.existsSync(Result.Opts.SourceMap)){
-          FS.writeFileSync(Result.Opts.SourceMap,'');
-        }
-        Temp = FS.realpathSync(Result.Opts.SourceMap);
-        if(Temp !== MyInfo.Config.SourceMap){
-          MyInfo.Config.SourceMap = Temp;
-          this.WriteManifest();
-        }
-      }
-      FS.writeFile(`${this.Dir}/${MyInfo.Config.Output}`, Result.Content);
-      global.uc_watcher_debug(`Watcher::OnChange Wrote ${RelativeFilePath} to ${MyInfo.Config.Output}`);
-      if(MyInfo.Config.SourceMap !== null){
-        FS.writeFile(`${this.Dir}/${MyInfo.Config.SourceMap}`, Result.SourceMap);
-        global.uc_watcher_debug(`Watcher::OnChange Wrote ${RelativeFilePath} SourceMap to ${MyInfo.Config.SourceMap}`);
-      }
-    }.bind(this),function(Err){
-      this.LogError(Err);
-    }.bind(this));
+      OptsProcess.Default(Me.Dir, MyInfo, MyInfo.Config, Result.Opts).then(function(UpdateDefault){
+        OptsProcess[MyInfo.Type](Me.Dir, MyInfo, MyInfo.Config, Result.Opts).then(function(UpdateSpecific){
+          if(UpdateDefault || UpdateSpecific) {
+            Me.WriteManifest();
+          }
+          FS.writeFile(`${Me.Dir}/${MyInfo.Config.Output}`, Result.Content);
+          global.uc_watcher_debug(`Watcher::OnChange Wrote ${RelativeFilePath} to ${MyInfo.Config.Output}`);
+          if(MyInfo.Config.SourceMap !== null){
+            FS.writeFile(`${Me.Dir}/${MyInfo.Config.SourceMap}`, Result.SourceMap);
+            global.uc_watcher_debug(`Watcher::OnChange Wrote ${RelativeFilePath} SourceMap to ${MyInfo.Config.SourceMap}`);
+          }
+        });
+      });
+    },function(Err){
+      Me.LogError(Err);
+    });
   }
   LogError(Err){
     console.log(Err);
