@@ -19,23 +19,25 @@ class H{
       RelativePath.join(Path.sep) + Path.sep + Path2.join(Path.sep) :
       Path2.join(Path.sep);
   }
-  static Clone(Obj) {
-    var Key, New, Value;
-    if (!(Obj !== null && typeof Obj === 'object')) {
-      return Obj;
-    }
-    New = Obj.constructor();
-    for (Key in Obj){
-      if(Obj.hasOwnProperty(Key)){
-        Value = Obj[Key];
-        if (typeof Value === 'object') {
-          New[Key] = H.Clone(Value);
-        } else {
-          New[Key] = Value;
+  static Merge():Object{
+    var ToReturn = {};
+    Array.prototype.forEach.call(arguments,function(Argument){
+      var Key = null, Value = null;
+      for(Key in Argument){
+        if(Argument.hasOwnProperty(Key)){
+          Value = Argument[Key];
+          if(Value instanceof Array){
+            ToReturn[Key] = ToReturn[Key] || [];
+            ToReturn[Key].concat(Value);
+          } else if(Value !== null && typeof Value === 'object'){
+            ToReturn[Key] = H.Merge(Value);
+          } else {
+            ToReturn[Key] = Value;
+          }
         }
       }
-    }
-    return New;
+    });
+    return ToReturn;
   }
   static ABSPath(FilePath:String, FileDir:String):String{
     if (FilePath.substr(0, 1) !== Path.sep &&
