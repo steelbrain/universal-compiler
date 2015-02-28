@@ -30,7 +30,7 @@ module.exports = (WatcherControl)->
           resolve Name: Path.basename(Dir), Items: Items, Version: WatcherControl.Version
     @ScanDir: (Directory, Excluded = [])->
       return new Promise (Resolve)->
-        ToReturn = Info: [], Tree: Dirs:{},Files:[]
+        ToReturn = Info: {}, Tree: Dirs:{},Files:[]
         FS.readdir Directory, (_, Contents)->
           Promises = []
           Contents.forEach (Entry)->
@@ -40,12 +40,14 @@ module.exports = (WatcherControl)->
               FS.stat FullPath, (_, Stats)->
                 if Stats.isDirectory()
                   H.ScanDir(FullPath).then (Results)->
-                    Results.Info.forEach (Item)-> ToReturn.Info.push(Item)
+                    for FilePath,Item of Results.Info
+                      ToReturn.Info[FilePath] = Item
                     ToReturn.Tree.Dirs[Entry] = Results.Tree
                     ResolveFile()
                 else
                   ToReturn.Tree.Files.push Entry
-                  ToReturn.Info.push H.FileInfo FullPath,Entry
+                  FileInfo = H.FileInfo FullPath,Entry
+                  ToReturn.Info[FileInfo.Path] = FileInfo
                   ResolveFile()
           Promise.all(Promises).then ->
             Resolve ToReturn
