@@ -5,37 +5,44 @@ FS = require 'fs'
 Path = require 'path'
 Promise = require 'a-promise'
 {Compiler} = require '../Compiler/Compiler'
-WatcherControl = null
-class H
-  @ExcludedFiles = ['.git']
-  @Init:(WatcherControlClass)->
-    WatcherControl = WatcherControlClass
-  @FileInfo:(LePath,Name)->
-    Ext = Name.split('.').pop().toUpperCase()
-    return unless WatcherControl.FileTypes.hasOwnProperty Ext
-    return Path: LePath, Name:Name, Ext:Ext, Config: WatcherControl.FileTypes[Ext]
-  @Manifest:(Dir)->
-    return new Promise (resolve)->
-      H.ScanDir(Dir).then (Items)->
-        resolve Name: Path.basename(Dir), Items: Items
-  @ScanDir:(LePath)->
-    return new Promise (resolve)->
-      FS.readdir LePath, (_,Files)->
-        ToReturn = Folders:[], Files:[], Excluded:[]
-        Remaining = []
-        Files.forEach (File)->
-          return unless H.ExcludedFiles.indexOf(File) is -1
-          FilePath = LePath + Path.sep + File
-          Remaining.push FilePath
-          FS.stat FilePath, (_,Stat)->
-            if Stat.isDirectory()
-              H.ScanDir(FilePath).then (Results)->
-                ToReturn.Folders.push Name: File, Path: FilePath, Entries: Results
-                Remaining.splice(Remaining.indexOf(FilePath),1);
-                resolve(ToReturn) unless Remaining.length
-            else
-              LeFile = H.FileInfo(FilePath, File);
-              ToReturn.Files.push(LeFile) if LeFile
-              Remaining.splice(Remaining.indexOf(FilePath),1);
-              resolve(ToReturn) unless Remaining.length
-module.exports = H
+module.exports = (WatcherControl)->
+  class H
+    @ExcludedFiles = ['.git']
+    @Clone:(Obj)->
+      return Obj unless Obj isnt null and typeof Obj is 'object'
+      New = Obj.constructor()
+      for Key,Value of Obj
+        if typeof Value is 'object'
+          New[Key] = H.Clone Value
+        else
+          New[Key] = Value
+      return New
+    @FileInfo:(FullPath, Name)->
+      Ext = Name.split('.').pop().toUpperCase()
+      return unless WatcherControl.FileTypes.hasOwnProperty Ext
+      return Path: FullPath, Name:Name, Ext:Ext, Config: WatcherControl.FileTypes[Ext]
+    @Manifest:(Dir)->
+      return new Promise (resolve)->
+        H.ScanDir(Dir).then (Items)->
+          resolve Name: Path.basename(Dir), Items: Items
+    @ScanDir: (Directory, Excluded = [])->
+      return new Promise (Resolve)->
+        ToReturn = Info: [], Tree: Dirs:{},Files:[]
+        FS.readdir Directory, (_, Contents)->
+          Promises = []
+          Contents.forEach (Entry)->
+            FullPath = Directory + Path.sep + Entry
+            return unless H.ExcludedFiles.indexOf(Entry) is -1 and Excluded.indexOf(FullPath) is -1
+            Promises.push new Promise (ResolveFile)->
+              FS.stat FullPath, (_, Stats)->
+                if Stats.isDirectory()
+                  H.ScanDir(FullPath).then (Results)->
+                    Results.Info.forEach (Item)-> ToReturn.Info.push(Item)
+                    ToReturn.Tree.Dirs[Entry] = Results.Tree
+                    ResolveFile()
+                else
+                  ToReturn.Tree.Files.push Entry
+                  ToReturn.Info.push H.FileInfo FullPath,Entry
+                  ResolveFile()
+          Promise.all(Promises).then ->
+            Resolve ToReturn
