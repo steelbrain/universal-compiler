@@ -43,7 +43,7 @@ class Watcher extends EventEmitter{
   }
   WriteManifest():void{
     global.uc_watcher_debug("Watcher::WriteManifest");
-    FS.writeFile(this.ManifestPath,JSON.stringify(this.Manifest));
+    FS.writeFile(this.ManifestPath,JSON.stringify(this.Manifest, null, 2));
   }
   Watch():void{
     global.uc_watcher_debug("Watcher::Watch Watching files");
