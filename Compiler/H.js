@@ -25,12 +25,14 @@ class H{
       return Obj;
     }
     New = Obj.constructor();
-    for (Key of Obj){
-      Value = Obj[Key];
-      if (typeof Value === 'object') {
-        New[Key] = H.Clone(Value);
-      } else {
-        New[Key] = Value;
+    for (Key in Obj){
+      if(Obj.hasOwnProperty(Key)){
+        Value = Obj[Key];
+        if (typeof Value === 'object') {
+          New[Key] = H.Clone(Value);
+        } else {
+          New[Key] = Value;
+        }
       }
     }
     return New;
