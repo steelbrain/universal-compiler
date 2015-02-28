@@ -16,34 +16,42 @@ class Watcher extends EventEmitter{
   Manifest:Object;
   ManifestPath:String;
   constructor(Dir:String){
+    var Me = this;
     this.Dir = FS.realpathSync(Dir);
-    this.ManifestPath = `${this.Dir}${Path.sep}DeProc.json`;
-    CompilerH.FileExists(this.ManifestPath).then(function(){
-      CompilerH.FileRead(this.ManifestPath).then(function(Contents){
-        this.Manifest = JSON.parse(Contents);
-        this.emit('Init');
-      }.bind(this));
-    }.bind(this)).catch(function(){
+
+    Me.ManifestPath = `${Me.Dir}${Path.sep}DeProc.json`;
+
+    CompilerH.FileExists(Me.ManifestPath).then(function(){
+      CompilerH.FileRead(Me.ManifestPath).then(function(Contents){
+        Me.Manifest = JSON.parse(Contents);
+        Me.emit('Init');
+      });
+    },function(){
       WatcherH.Manifest(Dir).then(function(Manifest){
-        FS.writeFile(this.ManifestPath,JSON.stringify(Manifest));
-        this.Manifest = Manifest;
-        this.emit('Init');
-      }.bind(this));
-    }.bind(this));
-    this.on('Init',this.Watch.bind(this));
+        FS.writeFile(Me.ManifestPath,JSON.stringify(Manifest));
+        Me.Manifest = Manifest;
+        Me.emit('Init');
+      });
+    });
+
+    this.on('Init',Me.Watch.bind(Me));
   }
   Watch(){
 
   }
 }
 class WatcherControl{
+  static Init(){
+    global.uc_watcher_debug("WatcherControl::Init");
+    WatcherH = WatcherH(WatcherControl);
+  }
   static FileTypes:Object = {
-    'JS': {Compress: false, Compiler: 'Babel', SourceMap: null, Output: null, IncludedIn:[]},
-    'JSX': {Compress: false, Compiler: 'Babel', SourceMap: null, Output: null, IncludedIn:[]},
-    'TAG': {Compress: false, Compiler: 'Babel', SourceMap: null, Output: null, IncludedIn:[]},
-    'COFFEE': {Compress: false, SourceMap: null, Output: null, IncludedIn:[]},
-    'LESS': {Compress: false, SourceMap: null, Output: null, IncludedIn:[]},
-    'CSS': {Compress: false, SourceMap: null, Output: null, IncludedIn:[]}
+    'JS': {Compress: false, Compiler: 'Babel', SourceMap: null, Output: null, IncludedIn:[], Watch:false},
+    'JSX': {Compress: false, Compiler: 'Babel', SourceMap: null, Output: null, IncludedIn:[], Watch:true},
+    'TAG': {Compress: false, Compiler: 'Babel', SourceMap: null, Output: null, IncludedIn:[], Watch:true},
+    'COFFEE': {Compress: false, SourceMap: null, Output: null, IncludedIn:[], Watch:true},
+    'LESS': {Compress: false, SourceMap: null, Output: null, IncludedIn:[], Watch:true},
+    'CSS': {Compress: false, SourceMap: null, Output: null, IncludedIn:[], Watch:false}
   };
   static Watch(Dir:String){
     if(CompilerH.FileExists(Dir)){
@@ -55,5 +63,5 @@ class WatcherControl{
     }
   }
 }
-WatcherH.Init(WatcherControl);
+WatcherControl.Init();
 module.exports = {Watcher,WatcherControl};
