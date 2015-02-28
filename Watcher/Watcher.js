@@ -91,7 +91,12 @@ class Watcher extends EventEmitter{
         FS.writeFile(`${this.Dir}/${MyInfo.Config.SourceMap}`, Result.SourceMap);
         global.uc_watcher_debug(`Watcher::OnChange Wrote ${RelativeFilePath} SourceMap to ${this.Dir}/${MyInfo.Config.SourceMap}`);
       }
+    }.bind(this),function(Err){
+      this.LogError(Err);
     }.bind(this));
+  }
+  LogError(Err){
+    console.log(Err);
   }
 }
 class WatcherControl{
