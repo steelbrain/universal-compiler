@@ -22,26 +22,7 @@
         return FilePath.join(Path.sep);
       };
 
-      H.Clone = function(Obj) {
-        var Key, New, Value;
-        if (!(Obj !== null && typeof Obj === 'object')) {
-          return Obj;
-        }
-        New = Obj.constructor();
-        for (Key in Obj) {
-          Value = Obj[Key];
-          if (Obj.hasOwnProperty(Key)) {
-            if (typeof Value === 'object' && Value !== null) {
-              New[Key] = H.Clone(Value);
-            } else {
-              New[Key] = Value;
-            }
-          }
-        }
-        return New;
-      };
-
-      H.FileInfo = function(FullPath, Name) {
+      H.FileInfo = function(FullPath, RelativePath, Name) {
         var Ext, NameChunks, ToReturn;
         NameChunks = Name.split('.');
         Ext = NameChunks.pop().toUpperCase();
@@ -49,12 +30,13 @@
           return;
         }
         ToReturn = {
-          Path: FullPath,
+          Path: RelativePath + '/' + Name,
           Name: Name,
           Ext: Ext,
-          Config: WatcherControl.FileTypes[Ext]
+          Config: WatcherControl.FileTypes[Ext],
+          Type: WatcherControl.FileTypesProcessedExt[Ext].toUpperCase()
         };
-        ToReturn.Config.Output = H.FileDir(FullPath) + Path.sep + NameChunks.join('.') + '-dist.' + WatcherControl.FileTypesProcessedExt[Ext];
+        ToReturn.Config.Output = RelativePath + '/' + NameChunks.join('.') + '-dist.' + WatcherControl.FileTypesProcessedExt[Ext];
         return ToReturn;
       };
 
@@ -70,7 +52,10 @@
         });
       };
 
-      H.ScanDir = function(Directory, Excluded) {
+      H.ScanDir = function(Directory, RelativePath, Excluded) {
+        if (RelativePath == null) {
+          RelativePath = '';
+        }
         if (Excluded == null) {
           Excluded = [];
         }
@@ -96,7 +81,10 @@
                 return FS.stat(FullPath, function(_, Stats) {
                   var FileInfo;
                   if (Stats.isDirectory()) {
-                    return H.ScanDir(FullPath).then(function(Results) {
+                    if (RelativePath !== '') {
+                      RelativePath += '/';
+                    }
+                    return H.ScanDir(FullPath, RelativePath + Entry).then(function(Results) {
                       var FilePath, Item, ref;
                       ref = Results.Info;
                       for (FilePath in ref) {
@@ -108,8 +96,10 @@
                     });
                   } else {
                     ToReturn.Tree.Files.push(Entry);
-                    FileInfo = H.FileInfo(FullPath, Entry);
-                    ToReturn.Info[FileInfo.Path] = FileInfo;
+                    FileInfo = H.FileInfo(FullPath, RelativePath, Entry);
+                    if (FileInfo) {
+                      ToReturn.Info[FileInfo.Path] = FileInfo;
+                    }
                     return ResolveFile();
                   }
                 });

@@ -18,6 +18,7 @@ var EventEmitter = _require2.EventEmitter;
 var Path = require("path");
 var FS = require("fs");
 var Chokidar = new (require("chokidar").FSWatcher)();
+var OptsProcess = require("./OptsProcess");
 global.uc_watcher_debug = require("debug")("uc-watcher");
 
 var Watcher = (function (EventEmitter) {
@@ -48,6 +49,7 @@ var Watcher = (function (EventEmitter) {
 
     this.on("Init", this.Watch.bind(this));
     Chokidar.on("change", this.OnChange.bind(this));
+    Chokidar.on("unlink", this.OnRemove.bind(this));
   }
 
   _inherits(Watcher, EventEmitter);
@@ -67,7 +69,7 @@ var Watcher = (function (EventEmitter) {
         for (var Index in this.Manifest.Items.Info) {
           if (this.Manifest.Items.Info.hasOwnProperty(Index)) {
             if (this.Manifest.Items.Info[Index].Config.Watch) {
-              Chokidar.add(this.Manifest.Items.Info[Index].Path);
+              Chokidar.add("" + this.Dir + "/" + this.Manifest.Items.Info[Index].Path);
             }
           }
         }
@@ -75,40 +77,49 @@ var Watcher = (function (EventEmitter) {
       writable: true,
       configurable: true
     },
+    OnRemove: {
+      value: function OnRemove(FilePath) {
+        global.uc_watcher_debug("Watcher::OnRemove `" + FilePath + "`");
+        var RelativeFilePath = FilePath.substr(this.Dir.length + 1);
+        delete this.Manifest.Items.Info[RelativeFilePath];
+        Chokidar.unwatch(FilePath);
+        this.WriteManifest();
+      },
+      writable: true,
+      configurable: true
+    },
     OnChange: {
       value: function OnChange(FilePath) {
         global.uc_watcher_debug("Watcher::OnChange `" + FilePath + "`");
-        var MyInfo = this.Manifest.Items.Info[FilePath],
-            Temp = null;
-        Compiler.Compile(FilePath, { SourceMap: this.Manifest.Items.Info[FilePath].SourceMap }).then((function (Result) {
-          global.uc_watcher_debug("Watcher::OnChange Compiled `" + FilePath + "`");
-          if (Result.Opts.TargetFile !== null && MyInfo.Config.Output !== Result.Opts.TargetFile) {
-            if (!FS.existsSync(Result.Opts.TargetFile)) {
-              FS.writeFileSync(Result.Opts.TargetFile, "");
-            }
-            Temp = FS.realpathSync(Result.Opts.TargetFile);
-            if (Temp !== MyInfo.Config.Output) {
-              MyInfo.Config.Output = Temp;
-              this.WriteManifest();
-            }
-          }
-          if (Result.Opts.SourceMap !== null && MyInfo.Config.SourceMap !== Result.Opts.SourceMap) {
-            if (!FS.existsSync(Result.Opts.SourceMap)) {
-              FS.writeFileSync(Result.Opts.SourceMap, "");
-            }
-            Temp = FS.realpathSync(Result.Opts.SourceMap);
-            if (Temp !== MyInfo.Config.SourceMap) {
-              MyInfo.Config.SourceMap = Temp;
-              this.WriteManifest();
-            }
-          }
-          FS.writeFile(MyInfo.Config.Output, Result.Content);
-          global.uc_watcher_debug("Watcher::OnChange Wrote `" + FilePath + "` to `" + MyInfo.Config.Output + "`");
-          if (MyInfo.Config.SourceMap !== null) {
-            FS.writeFile(MyInfo.Config.SourceMap, Result.SourceMap);
-            global.uc_watcher_debug("Watcher::OnChange Wrote `" + FilePath + "` SourceMap to `" + MyInfo.Config.SourceMap + "`");
-          }
-        }).bind(this));
+        var RelativeFilePath = FilePath.substr(this.Dir.length + 1),
+            MyInfo = this.Manifest.Items.Info[RelativeFilePath],
+            Temp = null,
+            Me = this;
+        Compiler.Compile(FilePath, MyInfo.Config).then(function (Result) {
+          global.uc_watcher_debug("Watcher::OnChange Compiler::Compile Completed for `" + FilePath + "`");
+          OptsProcess.Default(Me.Dir, MyInfo, MyInfo.Config, Result.Opts).then(function (UpdateDefault) {
+            OptsProcess[MyInfo.Type](Me.Dir, MyInfo, MyInfo.Config, Result.Opts).then(function (UpdateSpecific) {
+              if (UpdateDefault || UpdateSpecific) {
+                Me.WriteManifest();
+              }
+              FS.writeFile("" + Me.Dir + "/" + MyInfo.Config.Output, Result.Content);
+              global.uc_watcher_debug("Watcher::OnChange Wrote " + RelativeFilePath + " to " + MyInfo.Config.Output);
+              if (MyInfo.Config.SourceMap !== null) {
+                FS.writeFile("" + Me.Dir + "/" + MyInfo.Config.SourceMap, Result.SourceMap);
+                global.uc_watcher_debug("Watcher::OnChange Wrote " + RelativeFilePath + " SourceMap to " + MyInfo.Config.SourceMap);
+              }
+            });
+          });
+        }, function (Err) {
+          Me.LogError(Err);
+        });
+      },
+      writable: true,
+      configurable: true
+    },
+    LogError: {
+      value: function LogError(Err) {
+        console.log(Err);
       },
       writable: true,
       configurable: true
