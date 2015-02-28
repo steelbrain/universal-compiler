@@ -62,7 +62,7 @@ class Watcher extends EventEmitter{
       MyInfo = this.Manifest.Items.Info[RelativeFilePath],
       Temp = null;
     Compiler.Compile(FilePath, {SourceMap: MyInfo.SourceMap}).then(function(Result){
-      global.uc_watcher_debug("Watcher::OnChange Compiled `" + FilePath + "`");
+      global.uc_watcher_debug("Watcher::OnChange Compiler::Compile Completed for `" + FilePath + "`");
       if(Result.Opts.TargetFile !== null &&
         MyInfo.Config.Output !== Result.Opts.TargetFile){
         if(!FS.existsSync(Result.Opts.TargetFile)){
@@ -86,10 +86,10 @@ class Watcher extends EventEmitter{
         }
       }
       FS.writeFile(`${this.Dir}/${MyInfo.Config.Output}`, Result.Content);
-      global.uc_watcher_debug(`Watcher::OnChange Wrote ${RelativeFilePath} to ${this.Dir}/${MyInfo.Config.Output}`);
+      global.uc_watcher_debug(`Watcher::OnChange Wrote ${RelativeFilePath} to ${MyInfo.Config.Output}`);
       if(MyInfo.Config.SourceMap !== null){
         FS.writeFile(`${this.Dir}/${MyInfo.Config.SourceMap}`, Result.SourceMap);
-        global.uc_watcher_debug(`Watcher::OnChange Wrote ${RelativeFilePath} SourceMap to ${this.Dir}/${MyInfo.Config.SourceMap}`);
+        global.uc_watcher_debug(`Watcher::OnChange Wrote ${RelativeFilePath} SourceMap to ${MyInfo.Config.SourceMap}`);
       }
     }.bind(this),function(Err){
       this.LogError(Err);
