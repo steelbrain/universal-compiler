@@ -28,4 +28,8 @@ module.exports =
       global.uc_watcher_debug "OptsProcess::Default Return Value #{ReturnVal}"
       Resolve ReturnVal
   JS:->
+    return new Promise (Resolve)->
+      Resolve false
   CSS:->
+    return new Promise (Resolve)->
+      Resolve false
