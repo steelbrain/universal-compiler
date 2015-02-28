@@ -18,9 +18,12 @@ module.exports = (WatcherControl)->
           New[Key] = Value
       return New
     @FileInfo:(FullPath, Name)->
-      Ext = Name.split('.').pop().toUpperCase()
+      NameChunks = Name.split('.')
+      Ext = NameChunks.pop().toUpperCase()
       return unless WatcherControl.FileTypes.hasOwnProperty Ext
-      return Path: FullPath, Name:Name, Ext:Ext, Config: WatcherControl.FileTypes[Ext]
+      ToReturn = Path: FullPath, Name:Name, Ext:Ext, Config: WatcherControl.FileTypes[Ext]
+      ToReturn.Config.Output = NameChunks.join('.') + '-dist.' + WatcherControl.FileTypesProcessedExt[Ext]
+      return ToReturn
     @Manifest:(Dir)->
       return new Promise (resolve)->
         H.ScanDir(Dir).then (Items)->

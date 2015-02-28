@@ -49,7 +49,9 @@ class Watcher extends EventEmitter{
   }
   OnChange(FilePath:String):void{
     global.uc_watcher_debug("Watcher::OnChange `" + FilePath + "`");
-    Compiler.Compile(FilePath);
+    Compiler.Compile(FilePath).then(function(Result){
+      console.log(Result);
+    });
   }
 }
 class WatcherControl{
@@ -59,12 +61,20 @@ class WatcherControl{
     WatcherH = WatcherH(WatcherControl);
   }
   static FileTypes:Object = {
-    'JS': {Compress: false, Compiler: 'Babel', SourceMap: null, Output: null, IncludedIn:[], Watch:false},
-    'JSX': {Compress: false, Compiler: 'Babel', SourceMap: null, Output: null, IncludedIn:[], Watch:true},
-    'TAG': {Compress: false, Compiler: 'Babel', SourceMap: null, Output: null, IncludedIn:[], Watch:true},
-    'COFFEE': {Compress: false, SourceMap: null, Output: null, IncludedIn:[], Watch:true},
-    'LESS': {Compress: false, SourceMap: null, Output: null, IncludedIn:[], Watch:true},
-    'CSS': {Compress: false, SourceMap: null, Output: null, IncludedIn:[], Watch:false}
+    'JS': {Compress: false, Compiler: 'Babel', SourceMap: null, IncludedIn:[], Watch:false},
+    'JSX': {Compress: false, Compiler: 'Babel', SourceMap: null, IncludedIn:[], Watch:true},
+    'TAG': {Compress: false, Compiler: 'Babel', SourceMap: null, IncludedIn:[], Watch:true},
+    'COFFEE': {Compress: false, SourceMap: null, IncludedIn:[], Watch:true},
+    'LESS': {Compress: false, SourceMap: null, IncludedIn:[], Watch:true},
+    'CSS': {Compress: false, SourceMap: null, IncludedIn:[], Watch:false}
+  };
+  static FileTypesProcessedExt:Object = {
+    'JS': 'js',
+    'JSX': 'js',
+    'TAG': 'js',
+    'COFFEE': 'js',
+    'LESS': 'css',
+    'CSS': 'css'
   };
   static Watch(Dir:String){
     if(CompilerH.FileExists(Dir)){
