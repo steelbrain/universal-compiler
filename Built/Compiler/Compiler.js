@@ -46,15 +46,11 @@ var Compiler = (function () {
           H.FileExists(SourceFile).then(function () {
             global.uc_compiler_debug("Compiler::Compile Exists");
             var Extension = SourceFile.split(".").pop().toUpperCase(),
-                CompileOpts = null;
+                CompileOpts = H.Merge({}, { TargetFile: null, SourceMap: null, Write: false }, Compiler.Map[Extension].Opts, Opts);
             if (!Compiler.Map.hasOwnProperty(Extension)) {
               global.uc_compiler_debug("Compiler::Compile Unrecognized");
               return Reject("The given file type is not recognized");
             }
-            CompileOpts = H.Clone(Compiler.Map[Extension].Opts);
-            CompileOpts.TargetFile = Opts.TargetFile || null;
-            CompileOpts.SourceMap = Opts.SourceMap || null;
-            CompileOpts.Write = Boolean(Opts.Write);
             CompileOpts.IncludedFiles = [];
             global.uc_compiler_debug("Compiler::Compile Pre-Process");
             Compiler.Map[Extension].Compiler.Process(SourceFile, CompileOpts).then(function (Result) {

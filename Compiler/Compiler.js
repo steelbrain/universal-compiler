@@ -33,7 +33,7 @@ class Compiler{
         global.uc_compiler_debug("Compiler::Compile Exists");
         var
           Extension = SourceFile.split('.').pop().toUpperCase(),
-          CompileOpts = H.Merge({TargetFile: null, SourceMap: null, Write:false}, Compiler.Map[Extension].Opts, Opts);
+          CompileOpts = H.Merge({}, {TargetFile: null, SourceMap: null, Write:false}, Compiler.Map[Extension].Opts, Opts);
         if(!Compiler.Map.hasOwnProperty(Extension)){
           global.uc_compiler_debug("Compiler::Compile Unrecognized");
           return Reject('The given file type is not recognized');
