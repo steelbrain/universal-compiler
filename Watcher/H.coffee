@@ -12,7 +12,7 @@ module.exports = (WatcherControl)->
       return Obj unless Obj isnt null and typeof Obj is 'object'
       New = Obj.constructor()
       for Key,Value of Obj
-        if typeof Value is 'object'
+        if typeof Value is 'object' and Value isnt null
           New[Key] = H.Clone Value
         else
           New[Key] = Value
