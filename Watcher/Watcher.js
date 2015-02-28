@@ -4,40 +4,52 @@
 var
   Promise = require('a-promise'),
   WatcherH = require('./H'),
-  Compiler = require('../Compiler/Compiler'),
+  {Compiler} = require('../Compiler/Compiler'),
   CompilerH = require('../Compiler/H'),
   {EventEmitter} = require('events'),
   Path = require('path'),
   FS = require('fs'),
-  Chokidar = require('chokidar');
+  Chokidar = new (require('chokidar').FSWatcher);
 global.uc_watcher_debug = require('debug')('uc-watcher');
 class Watcher extends EventEmitter{
   Dir:String;
   Manifest:Object;
   ManifestPath:String;
   constructor(Dir:String){
+    global.uc_watcher_debug("Watcher::__construct");
     var Me = this;
     this.Dir = FS.realpathSync(Dir);
 
     Me.ManifestPath = `${Me.Dir}${Path.sep}DeProc.json`;
 
     CompilerH.FileExists(Me.ManifestPath).then(function(){
+      global.uc_watcher_debug("Watcher::__construct Manifest Exists");
       CompilerH.FileRead(Me.ManifestPath).then(function(Contents){
         Me.Manifest = JSON.parse(Contents);
         Me.emit('Init');
       });
     },function(){
+      global.uc_watcher_debug("Watcher::__construct Manifest Doesn't Exist");
       WatcherH.Manifest(Dir).then(function(Manifest){
+        global.uc_watcher_debug("Watcher::__construct Writing Manifest");
         FS.writeFile(Me.ManifestPath,JSON.stringify(Manifest));
         Me.Manifest = Manifest;
         Me.emit('Init');
       });
     });
 
-    this.on('Init',Me.Watch.bind(Me));
+    this.on('Init',this.Watch.bind(this));
+    Chokidar.on('change', this.OnChange.bind(this));
   }
-  Watch(){
-
+  Watch():void{
+    global.uc_watcher_debug("Watcher::Watch Watching " + this.Manifest.Items.Info.length + " files");
+    this.Manifest.Items.Info.forEach(function(Item){
+      Chokidar.add(Item.Path);
+    });
+  }
+  OnChange(FilePath:String):void{
+    global.uc_watcher_debug("Watcher::OnChange `" + FilePath + "`");
+    Compiler.Compile(FilePath);
   }
 }
 class WatcherControl{
