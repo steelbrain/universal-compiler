@@ -19,18 +19,18 @@ class H{
       RelativePath.join(Path.sep) + Path.sep + Path2.join(Path.sep) :
       Path2.join(Path.sep);
   }
-  static Merge():Object{
-    var ToReturn = {};
-    Array.prototype.forEach.call(arguments,function(Argument){
+  static Merge(ToReturn = {}):Object{
+    Array.prototype.slice.call(arguments,1).forEach(function(Argument){
       var Key = null, Value = null;
       for(Key in Argument){
         if(Argument.hasOwnProperty(Key)){
           Value = Argument[Key];
-          if(Value instanceof Array){
+          if (Value !== null && Value.constructor.name === 'Array'){
             ToReturn[Key] = ToReturn[Key] || [];
-            ToReturn[Key].concat(Value);
-          } else if(Value !== null && typeof Value === 'object'){
-            ToReturn[Key] = H.Merge(Value);
+            H.Merge()
+          } else if(typeof Value === 'object' && Value !== null){
+            ToReturn[Key] = ToReturn[Key] || {};
+            H.Merge(ToReturn[Key], Value);
           } else {
             ToReturn[Key] = Value;
           }

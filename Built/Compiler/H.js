@@ -30,24 +30,29 @@ var H = (function () {
       writable: true,
       configurable: true
     },
-    Clone: {
-      value: function Clone(Obj) {
-        var Key, New, Value;
-        if (!(Obj !== null && typeof Obj === "object")) {
-          return Obj;
-        }
-        New = Obj.constructor();
-        for (Key in Obj){
-          if(Obj.hasOwnProperty(Key)){
-            Value = Obj[Key];
-            if (typeof Value === 'object') {
-              New[Key] = H.Clone(Value);
-            } else {
-              New[Key] = Value;
+    Merge: {
+      value: function Merge() {
+        var ToReturn = arguments[0] === undefined ? {} : arguments[0];
+
+        Array.prototype.slice.call(arguments, 1).forEach(function (Argument) {
+          var Key = null,
+              Value = null;
+          for (Key in Argument) {
+            if (Argument.hasOwnProperty(Key)) {
+              Value = Argument[Key];
+              if (Value !== null && Value.constructor.name === "Array") {
+                ToReturn[Key] = ToReturn[Key] || [];
+                H.Merge();
+              } else if (typeof Value === "object" && Value !== null) {
+                ToReturn[Key] = ToReturn[Key] || {};
+                H.Merge(ToReturn[Key], Value);
+              } else {
+                ToReturn[Key] = Value;
+              }
             }
           }
-        }
-        return New;
+        });
+        return ToReturn;
       },
       writable: true,
       configurable: true
