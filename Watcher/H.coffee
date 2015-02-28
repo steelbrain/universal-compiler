@@ -12,15 +12,6 @@ module.exports = (WatcherControl)->
       FilePath = FilePath.split(Path.sep);
       FilePath.pop();
       return FilePath.join(Path.sep);
-    @Clone:(Obj)->
-      return Obj unless Obj isnt null and typeof Obj is 'object'
-      New = Obj.constructor()
-      for Key,Value of Obj when Obj.hasOwnProperty(Key)
-        if typeof Value is 'object' and Value isnt null
-          New[Key] = H.Clone Value
-        else
-          New[Key] = Value
-      return New
     @FileInfo:(FullPath, RelativePath, Name)->
       NameChunks = Name.split('.')
       Ext = NameChunks.pop().toUpperCase()
