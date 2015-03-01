@@ -16,8 +16,8 @@ module.exports = (WatcherControl)->
       NameChunks = Name.split('.')
       Ext = NameChunks.pop().toUpperCase()
       return unless WatcherControl.FileTypes.hasOwnProperty Ext
-      ToReturn = Path: RelativePath + '/' + Name, Name:Name, Ext:Ext, Config: WatcherControl.FileTypes[Ext], Type: WatcherControl.FileTypesProcessedExt[Ext].toUpperCase()
-      ToReturn.Config.Output = RelativePath + '/' + NameChunks.join('.') + '-dist.' + WatcherControl.FileTypesProcessedExt[Ext]
+      ToReturn = Path: RelativePath + Name, Name:Name, Ext:Ext, Config: WatcherControl.FileTypes[Ext], Type: WatcherControl.FileTypesProcessedExt[Ext].toUpperCase()
+      ToReturn.Config.Output = RelativePath + NameChunks.join('.') + '-dist.' + WatcherControl.FileTypesProcessedExt[Ext]
       return ToReturn
     @Manifest:(Dir)->
       return new Promise (resolve)->
