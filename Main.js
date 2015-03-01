@@ -1,4 +1,7 @@
+var Compiler = require('./Built/Compiler/Compiler').Compiler;
+var WatcherPack = require('./Built/Watcher/Watcher');
 module.exports = {
-  Compiler: require('./Built/Compiler/Compiler'),
-  Watcher: require('./Built/Watcher/Watcher')
+  Compiler: Compiler,
+  Watcher: WatcherPack.Watcher,
+  WatcherControl: WatcherPack.WatcherControl
 };
