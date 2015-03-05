@@ -17,7 +17,7 @@ var _require2 = require("events");
 var EventEmitter = _require2.EventEmitter;
 var Path = require("path");
 var FS = require("fs");
-var Chokidar = new (require("chokidar").FSWatcher)();
+var Chokidar = require("chokidar").FSWatcher;
 var OptsProcess = require("./OptsProcess");
 global.uc_watcher_debug = require("debug")("uc-watcher");
 
@@ -27,7 +27,7 @@ var Watcher = (function (EventEmitter) {
 
     global.uc_watcher_debug("Watcher::__construct");
     var Me = this;
-    this.Dir = FS.realpathSync(Dir);
+    Dir = this.Dir = FS.realpathSync(Dir);
 
     Me.ManifestPath = "" + Me.Dir + "" + Path.sep + "DeProc.json";
 
@@ -48,8 +48,6 @@ var Watcher = (function (EventEmitter) {
     });
 
     this.on("Init", this.Watch.bind(this));
-    Chokidar.on("change", this.OnChange.bind(this));
-    Chokidar.on("unlink", this.OnRemove.bind(this));
   }
 
   _inherits(Watcher, EventEmitter);
@@ -66,13 +64,25 @@ var Watcher = (function (EventEmitter) {
     Watch: {
       value: function Watch() {
         global.uc_watcher_debug("Watcher::Watch Watching files");
+        this.ChokidarInst = new Chokidar();
         for (var Index in this.Manifest.Items.Info) {
           if (this.Manifest.Items.Info.hasOwnProperty(Index)) {
             if (this.Manifest.Items.Info[Index].Config.Watch) {
-              Chokidar.add("" + this.Dir + "/" + this.Manifest.Items.Info[Index].Path);
+              this.ChokidarInst.add("" + this.Dir + "/" + this.Manifest.Items.Info[Index].Path);
             }
           }
         }
+        this.ChokidarInst.on("change", this.OnChange.bind(this));
+        this.ChokidarInst.on("unlink", this.OnRemove.bind(this));
+      },
+      writable: true,
+      configurable: true
+    },
+    UnWatch: {
+      value: function UnWatch() {
+        global.uc_watcher_debug("Watcher::UnWatch");
+        this.ChokidarInst.close();
+        this.ChokidarInst = null;
       },
       writable: true,
       configurable: true
@@ -82,7 +92,7 @@ var Watcher = (function (EventEmitter) {
         global.uc_watcher_debug("Watcher::OnRemove `" + FilePath + "`");
         var RelativeFilePath = FilePath.substr(this.Dir.length + 1);
         delete this.Manifest.Items.Info[RelativeFilePath];
-        Chokidar.unwatch(FilePath);
+        this.ChokidarInst.unwatch(FilePath);
         this.WriteManifest();
       },
       writable: true,
