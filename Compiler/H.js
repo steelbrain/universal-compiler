@@ -95,19 +95,5 @@ class H{
       }
     } catch(e){}
   }
-  static Extend(Out){
-    Out = Out || {};
-    H.Each(Array.prototype.slice.call(arguments,1),function(obj){
-      H.Each(obj,function(val,key){
-        if(typeof val === 'object' && val !== null){
-          Out[key] = Out[key] || {};
-          H.Extend(Out[key],val);
-        } else {
-          Out[key] = val;
-        }
-      });
-    });
-    return Out;
-  }
 }
 module.exports = H;
