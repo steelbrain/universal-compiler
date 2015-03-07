@@ -17,9 +17,9 @@ class Compiler{
     CompilerLESS = new (CompilerLESS(Compiler));
     CompilerCSS = new (CompilerCSS(Compiler));
     Compiler.Map = {
-      'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
-      'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false}},
-      'TAG': {Compiler: CompilerJS, Opts:{Compiler:'Riot', Shebang: null, Compress:false}},
+      'JS' : {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false, Transpile:false}},
+      'JSX': {Compiler: CompilerJS, Opts:{Compiler:'Babel', Shebang: null, Compress:false, Transpile:true}},
+      'TAG': {Compiler: CompilerJS, Opts:{Compiler:'Riot', Shebang: null, Compress:false, Transpile:true}},
       'COFFEE': {Compiler: CompilerCoffee, Opts:{Shebang: null, Compress: false}},
       'LESS': {Compiler: CompilerLESS, Opts:{Compress: false}},
       'CSS': {Compiler: CompilerCSS, Opts:{Compress: false}}

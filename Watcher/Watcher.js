@@ -108,9 +108,9 @@ class WatcherControl{
     WatcherH = WatcherH(WatcherControl);
   }
   static FileTypes:Object = {
-    'JS': {Compress: false, Compiler: 'Babel', SourceMap: null, IncludedIn:[], Watch:false},
-    'JSX': {Compress: false, Compiler: 'Babel', SourceMap: null, IncludedIn:[], Watch:true},
-    'TAG': {Compress: false, Compiler: 'Babel', SourceMap: null, IncludedIn:[], Watch:true},
+    'JS': {Compress: false, Compiler: 'Babel', SourceMap: null, IncludedIn:[], Watch:false, Transpile:false},
+    'JSX': {Compress: false, Compiler: 'Babel', SourceMap: null, IncludedIn:[], Watch:true, Transpile:true},
+    'TAG': {Compress: false, Compiler: 'Babel', SourceMap: null, IncludedIn:[], Watch:true, Transpile:true},
     'COFFEE': {Compress: false, SourceMap: null, IncludedIn:[], Watch:true},
     'LESS': {Compress: false, SourceMap: null, IncludedIn:[], Watch:true},
     'CSS': {Compress: false, SourceMap: null, IncludedIn:[], Watch:false}
