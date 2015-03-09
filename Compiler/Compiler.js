@@ -1,6 +1,7 @@
 
 
 // @Compiler-Output "../Built/Compiler/Compiler.js"
+// @Compiler-Transpile "true"
 var
   Promise = require('a-promise'),
   FS = require('fs'),

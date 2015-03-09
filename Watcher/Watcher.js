@@ -1,6 +1,7 @@
 
 
 // @Compiler-Output "../Built/Watcher/Watcher.js"
+// @Compiler-Transpile "true"
 var
   Promise = require('a-promise'),
   {Compiler} = require('../Compiler/Compiler'),

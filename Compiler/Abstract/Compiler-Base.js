@@ -1,6 +1,7 @@
 
 
 // @Compiler-Output "../../Built/Compiler/Abstract/Compiler-Base.js"
+// @Compiler-Transpile "true"
 var
   Path = require('path'),
   FS = require('fs'),

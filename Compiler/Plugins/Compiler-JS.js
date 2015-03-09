@@ -1,6 +1,7 @@
 
 
 // @Compiler-Output "../../Built/Compiler/Plugins/Compiler-JS.js"
+// @Compiler-Transpile "true"
 module.exports = function(Compiler){
   var
     Promise = require('a-promise'),
@@ -27,6 +28,23 @@ module.exports = function(Compiler){
               Opts.Compiler = 'Riot';
             }
           }
+        },
+        {
+          Tags: ['Compiler-Transpile'],
+          Callback: function(Info,Opts):void{
+            Opts.Transpile = Info[2] === 'true';
+          }
+        },
+        {
+          Tags: ['Compiler-Include'],
+          Callback: function(Info,Opts,Content,Line,Index,FileDir):Promise{
+            Opts.IncludedFiles.push(H.ABSPath(Info[2],FileDir));
+            return new Promise(function(Resolve,Reject){
+              Compiler.Compile(H.ABSPath(Info[2],FileDir), {Transpile:false}).then(function(Result){
+                Resolve(Result.Content);
+              },Reject);
+            });
+          }
         }
       ]
     };
@@ -42,20 +60,23 @@ module.exports = function(Compiler){
               Opts: Parsed.Opts,
               HasSourceMap: Parsed.Opts.SourceMap !== null
             };
-            try {
-              global.uc_compiler_debug("CompilerJS::Process Compile");
-              if(Parsed.Opts.Compiler === 'Babel'){
-                global.uc_compiler_debug("CompilerJS::Process Compiler Babel");
-                this.ProcessBabel(FilePath, ToReturn, Parsed);
-              } else if(Parsed.Opts.Compiler === 'ReactTools'){
-                global.uc_compiler_debug("CompilerJS::Process Compiler ReactTools");
-                this.ProcessReact(FilePath, ToReturn, Parsed);
-              } else if(Parsed.Opts.Compiler === 'Riot'){
-                global.uc_compiler_debug("CompilerJS::Process Compiler Riot");
-                this.ProcessRiot(FilePath, ToReturn, Parsed);
+            global.uc_compiler_debug(`CompilerJS::Process Should Transpile ${ToReturn.Opts.Transpile}`);
+            if(ToReturn.Opts.Transpile){
+              try {
+                global.uc_compiler_debug("CompilerJS::Process Compile");
+                if(Parsed.Opts.Compiler === 'Babel'){
+                  global.uc_compiler_debug("CompilerJS::Process Compiler Babel");
+                  this.ProcessBabel(FilePath, ToReturn, Parsed);
+                } else if(Parsed.Opts.Compiler === 'ReactTools'){
+                  global.uc_compiler_debug("CompilerJS::Process Compiler ReactTools");
+                  this.ProcessReact(FilePath, ToReturn, Parsed);
+                } else if(Parsed.Opts.Compiler === 'Riot'){
+                  global.uc_compiler_debug("CompilerJS::Process Compiler Riot");
+                  this.ProcessRiot(FilePath, ToReturn, Parsed);
+                }
+              } catch(error){
+                Reject(error);
               }
-            } catch(error){
-              Reject(error);
             }
             if(Opts.Compress){
               global.uc_compiler_debug("CompilerJS::Process Compress");

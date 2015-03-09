@@ -1,6 +1,7 @@
 
 
 // @Compiler-Output "../../Built/Compiler/Plugins/Compiler-LESS.js"
+// @Compiler-Transpile "true"
 module.exports = function(Compiler){
   var
     Promise = require('a-promise'),
