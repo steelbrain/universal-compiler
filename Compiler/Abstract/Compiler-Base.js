@@ -4,7 +4,6 @@
 // @Compiler-Transpile "true"
 var
   Path = require('path'),
-  FS = require('fs'),
   Promise = require('a-promise'),
   H = require('../../Misc/H')();
 module.exports = function(Compiler){
