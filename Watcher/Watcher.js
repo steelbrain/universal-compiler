@@ -3,9 +3,8 @@
 // @Compiler-Output "../Built/Watcher/Watcher.js"
 var
   Promise = require('a-promise'),
-  WatcherH = require('./H'),
   {Compiler} = require('../Compiler/Compiler'),
-  CompilerH = require('../Compiler/H'),
+  H = require('../Misc/H'),
   {EventEmitter} = require('events'),
   Path = require('path'),
   FS = require('fs'),
@@ -24,15 +23,15 @@ class Watcher extends EventEmitter{
 
     Me.ManifestPath = `${Me.Dir}${Path.sep}DeProc.json`;
 
-    CompilerH.FileExists(Me.ManifestPath).then(function(){
+    H.FileExists(Me.ManifestPath).then(function(){
       global.uc_watcher_debug("Watcher::__construct Manifest Exists");
-      CompilerH.FileRead(Me.ManifestPath).then(function(Contents){
+      H.FileRead(Me.ManifestPath).then(function(Contents){
         Me.Manifest = JSON.parse(Contents);
         Me.emit('Init');
       });
     },function(){
       global.uc_watcher_debug("Watcher::__construct Manifest Doesn't Exist");
-      WatcherH.Manifest(Dir).then(function(Manifest){
+      H.Manifest(Dir).then(function(Manifest){
         global.uc_watcher_debug("Watcher::__construct Writing Manifest");
         Me.Manifest = Manifest;
         Me.WriteManifest();
@@ -105,7 +104,7 @@ class WatcherControl{
   static Version = '0.0.1';
   static Init(){
     global.uc_watcher_debug("WatcherControl::Init");
-    WatcherH = WatcherH(WatcherControl);
+    H = H(WatcherControl);
   }
   static FileTypes:Object = {
     'JS': {Compress: false, Compiler: 'Babel', SourceMap: null, IncludedIn:[], Watch:false, Transpile:false},
@@ -124,7 +123,7 @@ class WatcherControl{
     'CSS': 'css'
   };
   static Watch(Dir:String){
-    if(CompilerH.FileExists(Dir)){
+    if(H.FileExists(Dir)){
       global.uc_watcher_debug("WatcherControl::Watch Initiating new Watcher");
       return new Watcher(Dir);
     } else {

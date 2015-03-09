@@ -9,7 +9,7 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 module.exports = function (Compiler) {
   var Promise = require("a-promise"),
       UglifyCSS = null,
-      H = require("../H"),
+      H = require("../../Misc/H")(),
       Path = require("path"),
       CompilerBase = require("../Abstract/Compiler-Base")(Compiler);
 

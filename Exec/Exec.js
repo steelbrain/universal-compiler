@@ -1,4 +1,4 @@
-#!/usr/local/bin/babel-node -g
+#!/usr/bin/nodejs
 
 var
   Compiler = require('../Built/Compiler/Compiler').Compiler;
@@ -7,7 +7,7 @@ if(!process.argv[2]){
   process.exit(1);
 }
 Compiler.Compile(process.argv[2],{Write:true}).then(function(Result){
-  if(!process.argv[3] && Result){
+  if(!process.argv[2] && Result){
     process.stdout.write(Result.Content);
   }
 },function(Error){

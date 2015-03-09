@@ -1,4 +1,4 @@
-#!/usr/local/bin/babel-node -g
+#!/usr/bin/nodejs
 
 var
   Compiler = require('../Built/Compiler/Compiler').Compiler,

@@ -5,7 +5,7 @@ var
   Path = require('path'),
   FS = require('fs'),
   Promise = require('a-promise'),
-  H = require('../H');
+  H = require('../../Misc/H')();
 module.exports = function(Compiler){
   class CompilerBase{
     static RegexLineInfo:RegExp = /@([a-zA-z1-9-]*) "(.*)"/;

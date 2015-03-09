@@ -7,11 +7,10 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 var Promise = require("a-promise");
-var WatcherH = require("./H");
 var _require = require("../Compiler/Compiler");
 
 var Compiler = _require.Compiler;
-var CompilerH = require("../Compiler/H");
+var H = require("../Misc/H");
 var _require2 = require("events");
 
 var EventEmitter = _require2.EventEmitter;
@@ -31,15 +30,15 @@ var Watcher = (function (EventEmitter) {
 
     Me.ManifestPath = "" + Me.Dir + "" + Path.sep + "DeProc.json";
 
-    CompilerH.FileExists(Me.ManifestPath).then(function () {
+    H.FileExists(Me.ManifestPath).then(function () {
       global.uc_watcher_debug("Watcher::__construct Manifest Exists");
-      CompilerH.FileRead(Me.ManifestPath).then(function (Contents) {
+      H.FileRead(Me.ManifestPath).then(function (Contents) {
         Me.Manifest = JSON.parse(Contents);
         Me.emit("Init");
       });
     }, function () {
       global.uc_watcher_debug("Watcher::__construct Manifest Doesn't Exist");
-      WatcherH.Manifest(Dir).then(function (Manifest) {
+      H.Manifest(Dir).then(function (Manifest) {
         global.uc_watcher_debug("Watcher::__construct Writing Manifest");
         Me.Manifest = Manifest;
         Me.WriteManifest();
@@ -146,9 +145,9 @@ var WatcherControl = (function () {
 
   WatcherControl.Version = "0.0.1";
   WatcherControl.FileTypes = {
-    JS: { Compress: false, Compiler: "Babel", SourceMap: null, IncludedIn: [], Watch: false },
-    JSX: { Compress: false, Compiler: "Babel", SourceMap: null, IncludedIn: [], Watch: true },
-    TAG: { Compress: false, Compiler: "Babel", SourceMap: null, IncludedIn: [], Watch: true },
+    JS: { Compress: false, Compiler: "Babel", SourceMap: null, IncludedIn: [], Watch: false, Transpile: false },
+    JSX: { Compress: false, Compiler: "Babel", SourceMap: null, IncludedIn: [], Watch: true, Transpile: true },
+    TAG: { Compress: false, Compiler: "Babel", SourceMap: null, IncludedIn: [], Watch: true, Transpile: true },
     COFFEE: { Compress: false, SourceMap: null, IncludedIn: [], Watch: true },
     LESS: { Compress: false, SourceMap: null, IncludedIn: [], Watch: true },
     CSS: { Compress: false, SourceMap: null, IncludedIn: [], Watch: false }
@@ -166,14 +165,14 @@ var WatcherControl = (function () {
     Init: {
       value: function Init() {
         global.uc_watcher_debug("WatcherControl::Init");
-        WatcherH = WatcherH(WatcherControl);
+        H = H(WatcherControl);
       },
       writable: true,
       configurable: true
     },
     Watch: {
       value: function Watch(Dir) {
-        if (CompilerH.FileExists(Dir)) {
+        if (H.FileExists(Dir)) {
           global.uc_watcher_debug("WatcherControl::Watch Initiating new Watcher");
           return new Watcher(Dir);
         } else {

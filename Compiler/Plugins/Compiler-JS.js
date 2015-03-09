@@ -8,7 +8,7 @@ module.exports = function(Compiler){
     Babel = null,
     Riot = null,
     ReactTools = null,
-    H = require('../H'),
+    H = require('../../Misc/H')(),
     Path = require('path'),
     CompilerBase = (require('../Abstract/Compiler-Base'))(Compiler);
   class CompilerJS extends CompilerBase{

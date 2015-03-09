@@ -6,7 +6,7 @@ module.exports = function(Compiler){
     Promise = require('a-promise'),
     UglifyJS = null,
     CoffeeScript = null,
-    H = require('../H'),
+    H = require('../../Misc/H')(),
     Path = require('path'),
     CompilerBase = (require('../Abstract/Compiler-Base'))(Compiler);
   class CompilerCoffee extends CompilerBase{

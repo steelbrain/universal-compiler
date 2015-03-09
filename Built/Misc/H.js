@@ -1,13 +1,11 @@
 (function() {
-  var Compiler, FS, Path, Promise;
-
-  FS = require('fs');
+  var FS, Path, Promise;
 
   Path = require('path');
 
   Promise = require('a-promise');
 
-  Compiler = require('../Compiler/Compiler').Compiler;
+  FS = require('fs');
 
   module.exports = function(WatcherControl) {
     var H;
@@ -46,6 +44,57 @@
         return FileInfo;
       };
 
+      H.FileRelative = function(Path1, Path2) {
+        var I, RelativePath;
+        Path1 = Path1.split(Path.sep);
+        Path2 = Path2.split(Path.sep);
+        RelativePath = [];
+        while (Path1.length && Path2.length && Path1[0] === Path2[0]) {
+          Path1.splice(Path1[0], 1);
+          Path2.splice(Path2[0], 1);
+        }
+        I = 0;
+        while (I < Path1.length) {
+          RelativePath.push('..');
+          ++I;
+        }
+        if (RelativePath.length) {
+          return RelativePath.join(Path.sep) + Path.sep + Path2.join(Path.sep);
+        }
+        return Path2.join(Path.sep);
+      };
+
+      H.FileRead = function(FilePath) {
+        return new Promise(function(Resolve, Reject) {
+          return FS.readFile(FilePath, function(Error, Contents) {
+            if (Error) {
+              return Reject(Error);
+            } else {
+              return Resolve(Contents.toString());
+            }
+          });
+        });
+      };
+
+      H.FileExists = function(FilePath) {
+        return new Promise(function(Resolve, Reject) {
+          return FS.exists(FilePath, function(Status) {
+            if (Status) {
+              return Resolve();
+            } else {
+              return Reject();
+            }
+          });
+        });
+      };
+
+      H.ABSPath = function(FilePath, FileDir) {
+        if (FilePath.substr(0, 1) !== Path.sep && FilePath.substr(1, 1) !== ':') {
+          FilePath = FileDir + Path.sep + FilePath;
+        }
+        return FilePath;
+      };
+
       H.Manifest = function(Dir) {
         return new Promise(function(resolve) {
           return H.ScanDir(Dir).then(function(Items) {
@@ -61,27 +110,54 @@
       H.Merge = function(ToReturn) {
         ToReturn = ToReturn || {};
         Array.prototype.slice.call(arguments, 1).forEach(function(Argument) {
-          var Key, Value, i, len, results;
+          var Key, Value, results;
           results = [];
-          for (Value = i = 0, len = Argument.length; i < len; Value = ++i) {
-            Key = Argument[Value];
-            if (Argument.hasOwnProperty(Key)) {
-              if (Value !== null && typeof Value === 'object') {
-                if (Value.constructor.name === 'Array') {
-                  ToReturn[Key] = ToReturn[Key] || [];
-                  results.push(ToReturn[Key].concat(Value));
-                } else {
-                  ToReturn[Key] = ToReturn[Key] || {};
-                  results.push(H.Merge(ToReturn[Key], Value));
-                }
+          for (Key in Argument) {
+            Value = Argument[Key];
+            if (Value !== null && typeof Value === 'object') {
+              if (Value.constructor.name === 'Array') {
+                ToReturn[Key] = ToReturn[Key] || [];
+                results.push(ToReturn[Key].concat(Value));
               } else {
-                results.push(ToReturn[Key] = Value);
+                ToReturn[Key] = ToReturn[Key] || {};
+                results.push(H.Merge(ToReturn[Key], Value));
               }
+            } else {
+              results.push(ToReturn[Key] = Value);
             }
           }
           return results;
         });
         return ToReturn;
+      };
+
+      H.Each = function(object, callback) {
+        var i, j, len, results;
+        if (!object) {
+          return;
+        }
+        try {
+          if (typeof object !== 'function' && typeof object.length !== 'undefined') {
+            return Array.prototype.forEach.call(object, function(I, II) {
+              if (callback.call(I, I, II) === false) {
+                throw null;
+              }
+            });
+          } else {
+            results = [];
+            for (j = 0, len = object.length; j < len; j++) {
+              i = object[j];
+              if (object.hasOwnProperty(i)) {
+                if (callback.call(object[i], object[i], i) === false) {
+                  throw null;
+                } else {
+                  results.push(void 0);
+                }
+              }
+            }
+            return results;
+          }
+        } catch (_error) {}
       };
 
       H.ScanDir = function(Directory, RelativePath, Excluded) {

@@ -6,7 +6,7 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 var Promise = require("a-promise"),
     FS = require("fs"),
-    H = require("./H"),
+    H = require("./../Misc/H")(),
     CompilerJS = require("./Plugins/Compiler-JS"),
     CompilerCoffee = require("./Plugins/Compiler-Coffee"),
     CompilerLESS = require("./Plugins/Compiler-LESS"),
@@ -28,9 +28,9 @@ var Compiler = (function () {
         CompilerLESS = new (CompilerLESS(Compiler))();
         CompilerCSS = new (CompilerCSS(Compiler))();
         Compiler.Map = {
-          JS: { Compiler: CompilerJS, Opts: { Compiler: "Babel", Shebang: null, Compress: false } },
-          JSX: { Compiler: CompilerJS, Opts: { Compiler: "Babel", Shebang: null, Compress: false } },
-          TAG: { Compiler: CompilerJS, Opts: { Compiler: "Riot", Shebang: null, Compress: false } },
+          JS: { Compiler: CompilerJS, Opts: { Compiler: "Babel", Shebang: null, Compress: false, Transpile: false } },
+          JSX: { Compiler: CompilerJS, Opts: { Compiler: "Babel", Shebang: null, Compress: false, Transpile: true } },
+          TAG: { Compiler: CompilerJS, Opts: { Compiler: "Riot", Shebang: null, Compress: false, Transpile: true } },
           COFFEE: { Compiler: CompilerCoffee, Opts: { Shebang: null, Compress: false } },
           LESS: { Compiler: CompilerLESS, Opts: { Compress: false } },
           CSS: { Compiler: CompilerCSS, Opts: { Compress: false } }

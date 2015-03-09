@@ -7,7 +7,7 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 var Path = require("path"),
     FS = require("fs"),
     Promise = require("a-promise"),
-    H = require("../H");
+    H = require("../../Misc/H")();
 module.exports = function (Compiler) {
   var CompilerBase = (function () {
     function CompilerBase() {

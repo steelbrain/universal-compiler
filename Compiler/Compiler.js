@@ -4,7 +4,7 @@
 var
   Promise = require('a-promise'),
   FS = require('fs'),
-  H = require('./H'),
+  H = require('./../Misc/H')(),
   CompilerJS = require('./Plugins/Compiler-JS'),
   CompilerCoffee = require('./Plugins/Compiler-Coffee'),
   CompilerLESS = require('./Plugins/Compiler-LESS'),

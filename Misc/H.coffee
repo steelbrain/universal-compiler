@@ -1,10 +1,11 @@
 
 
-# @Compiler-Output "../Built/Watcher/H.js"
-FS = require 'fs'
+# @Compiler-Output "../Built/Misc/H.js"
 Path = require 'path'
 Promise = require 'a-promise'
-{Compiler} = require '../Compiler/Compiler'
+FS = require 'fs'
+
+
 module.exports = (WatcherControl)->
   class H
     @ExcludedFiles = ['.git', '.idea', 'Built', 'Build', 'build', 'built', 'node_modules']
@@ -28,6 +29,39 @@ module.exports = (WatcherControl)->
         Type: WatcherControl.FileTypesProcessedExt[Ext].toUpperCase()
       FileInfo.Config.Output = RelativePath + Path.sep + H.FileName(FileInfo.Name) + '-dist.' + WatcherControl.FileTypesProcessedExt[Ext]
       return FileInfo
+    @FileRelative:(Path1, Path2)->
+      Path1 = Path1.split Path.sep
+      Path2 = Path2.split Path.sep
+
+      RelativePath = []
+
+      while Path1.length and Path2.length and Path1[0] == Path2[0]
+        Path1.splice Path1[0], 1
+        Path2.splice Path2[0], 1
+      I = 0
+      while I < Path1.length
+        RelativePath.push '..'
+        ++I
+      return RelativePath.join(Path.sep) + Path.sep + Path2.join(Path.sep) if RelativePath.length
+      return Path2.join(Path.sep);
+    @FileRead:(FilePath)->
+      return new Promise (Resolve,Reject)->
+        FS.readFile FilePath, (Error, Contents)->
+          if Error
+            Reject Error
+          else
+            Resolve Contents.toString()
+    @FileExists:(FilePath)->
+      return new Promise (Resolve,Reject)->
+        FS.exists FilePath, (Status)->
+          if Status
+            Resolve()
+          else
+            Reject()
+    @ABSPath:(FilePath, FileDir)->
+      if FilePath.substr(0,1) isnt Path.sep and FilePath.substr(1,1) isnt ':'
+        FilePath = FileDir + Path.sep + FilePath
+      FilePath
     @Manifest:(Dir)->
       return new Promise (resolve)->
         H.ScanDir(Dir).then (Items)->
@@ -46,6 +80,15 @@ module.exports = (WatcherControl)->
           else
             ToReturn[Key] = Value
       ToReturn
+    @Each:(object,callback)->
+      return unless object
+      try
+        if typeof object isnt 'function' and typeof object.length isnt 'undefined'
+          Array.prototype.forEach.call object, (I,II)->
+            if callback.call(I,I,II) is false then throw null
+        else
+          for i in object when object.hasOwnProperty(i)
+            if callback.call(object[i],object[i],i) is false then throw null
     @ScanDir: (Directory, RelativePath = '', Excluded = [])->
       return new Promise (Resolve)->
         ToReturn = Info: {}, Tree: Dirs:{},Files:[]
