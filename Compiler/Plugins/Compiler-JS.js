@@ -40,7 +40,7 @@ module.exports = function(Compiler){
           Callback: function(Info,Opts,Content,Line,Index,FileDir):Promise{
             Opts.IncludedFiles.push(H.ABSPath(Info[2],FileDir));
             return new Promise(function(Resolve,Reject){
-              Compiler.Compile(H.ABSPath(Info[2],FileDir), {Transpile:false}).then(function(Result){
+              Compiler.Compile(H.ABSPath(Info[2],FileDir), {Transpile:false, Write:false}).then(function(Result){
                 Resolve(Result.Content);
               },Reject);
             });

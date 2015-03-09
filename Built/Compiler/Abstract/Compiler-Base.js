@@ -35,7 +35,7 @@ module.exports = function (Compiler) {
       Callback: function Callback(Info, Opts, Content, Line, Index, FileDir) {
         Opts.IncludedFiles.push(H.ABSPath(Info[2], FileDir));
         return new Promise(function (Resolve, Reject) {
-          Compiler.Compile(H.ABSPath(Info[2], FileDir)).then(function (Result) {
+          Compiler.Compile(H.ABSPath(Info[2], FileDir), { Write: false }).then(function (Result) {
             Resolve(Result.Content);
           }, Reject);
         });
