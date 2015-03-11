@@ -33,14 +33,17 @@
         if (!WatcherControl.FileTypes.hasOwnProperty(Ext)) {
           return;
         }
+        if (RelativePath !== '') {
+          RelativePath = RelativePath + Path.sep;
+        }
         FileInfo = {
-          Path: RelativePath + Path.sep + Name,
+          Path: RelativePath + Name,
           Name: Name,
           Ext: Ext,
           Config: H.Merge({}, WatcherControl.FileTypes[Ext]),
           Type: WatcherControl.FileTypesProcessedExt[Ext].toUpperCase()
         };
-        FileInfo.Config.Output = RelativePath + Path.sep + H.FileName(FileInfo.Name) + '-dist.' + WatcherControl.FileTypesProcessedExt[Ext];
+        FileInfo.Config.Output = RelativePath + H.FileName(FileInfo.Name) + '-dist.' + WatcherControl.FileTypesProcessedExt[Ext];
         return FileInfo;
       };
 
