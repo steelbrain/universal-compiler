@@ -66,7 +66,7 @@ module.exports = (WatcherControl)->
     @Manifest:(Dir)->
       return new Promise (resolve)->
         H.ScanDir(Dir).then (Items)->
-          resolve Name: Path.basename(Dir), Items: Items, Version: WatcherControl.Version
+          resolve Name: Path.basename(Dir), Items: Items, Version: WatcherControl.Version, Excluded:[]
     @Merge:(ToReturn)->
       ToReturn = ToReturn || {}
       Array.prototype.slice.call(arguments,1).forEach (Argument)->
