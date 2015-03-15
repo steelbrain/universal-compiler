@@ -1,4 +1,4 @@
-#!/usr/bin/nodejs
+#!/usr/bin/env nodejs
 
 var
   Compiler = require('../Built/Compiler/Compiler').Compiler;
