@@ -8,7 +8,6 @@ FS = require 'fs'
 
 module.exports = (WatcherControl)->
   class H
-    @ExcludedFiles = ['.git', '.idea', 'Built', 'Build', 'build', 'built', 'node_modules']
     @FileDir:(FilePath)->
       FilePath = FilePath.split(Path.sep);
       FilePath.pop();
@@ -65,8 +64,10 @@ module.exports = (WatcherControl)->
       FilePath
     @Manifest:(Dir)->
       return new Promise (resolve)->
-        H.ScanDir(Dir).then (Items)->
-          resolve Name: Path.basename(Dir), Items: Items, Version: WatcherControl.Version, Excluded:[]
+        ToReturn = Name: Path.basename(Dir), Version: WatcherControl.Version, Excluded:['.git', '.idea', 'Built', 'Build', 'build', 'built', 'node_modules']
+        H.ScanDir(Dir, ToReturn.Excluded).then (Items)->
+          ToReturn.Items = Items;
+          resolve(ToReturn)
     @Merge:(ToReturn)->
       ToReturn = ToReturn || {}
       Array.prototype.slice.call(arguments,1).forEach (Argument)->
@@ -97,12 +98,11 @@ module.exports = (WatcherControl)->
           Promises = []
           Contents.forEach (Entry)->
             FullPath = Directory + Path.sep + Entry
-            return unless H.ExcludedFiles.indexOf(Entry) is -1 and Excluded.indexOf(FullPath) is -1
             Promises.push new Promise (ResolveFile)->
               FS.stat FullPath, (_, Stats)->
                 if Stats.isDirectory()
                   NewRelativePath = RelativePath + (if RelativePath is '' then '' else '/')
-                  H.ScanDir(FullPath, NewRelativePath + Entry).then (Results)->
+                  H.ScanDir(FullPath, NewRelativePath + Entry, Excluded).then (Results)->
                     for FilePath,Item of Results.Info
                       ToReturn.Info[FilePath] = Item
                     ToReturn.Tree.Dirs[Entry] = Results.Tree

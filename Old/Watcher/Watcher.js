@@ -5,7 +5,7 @@
 var
   Promise = require('a-promise'),
   {Compiler} = require('../Compiler/Compiler'),
-  H = require('../Misc/H'),
+  H = null,
   {EventEmitter} = require('events'),
   Path = require('path'),
   FS = require('fs'),
@@ -19,28 +19,26 @@ class Watcher extends EventEmitter{
   ChokidarInst:Chokidar;
   constructor(Dir:String){
     global.uc_watcher_debug("Watcher::__construct");
+    this.Dir = FS.realpathSync(Dir);
+    this.ManifestPath = `${Dir}${Path.sep}DeProc.json`;
+  }
+  Init(){
     var Me = this;
-    Dir = this.Dir = FS.realpathSync(Dir);
-
-    Me.ManifestPath = `${Me.Dir}${Path.sep}DeProc.json`;
-
-    H.FileExists(Me.ManifestPath).then(function(){
-      global.uc_watcher_debug("Watcher::__construct Manifest Exists");
-      H.FileRead(Me.ManifestPath).then(function(Contents){
-        Me.Manifest = JSON.parse(Contents);
-        Me.emit('Init');
-      });
-    },function(){
-      global.uc_watcher_debug("Watcher::__construct Manifest Doesn't Exist");
-      H.Manifest(Dir).then(function(Manifest){
-        global.uc_watcher_debug("Watcher::__construct Writing Manifest");
-        Me.Manifest = Manifest;
-        Me.WriteManifest();
-        Me.emit('Init');
+    return new Promise(function(Resolve){
+      H.FileExists(Me.ManifestPath).then(function(){
+        global.uc_watcher_debug("Watcher::__construct Manifest Exists");
+        H.FileRead(Me.ManifestPath).then(function(Contents){
+          Resolve();
+        });
+      },function(){
+        global.uc_watcher_debug("Watcher::__construct Manifest Doesn't Exist");
+        H.Manifest(Me.Dir).then(function(Manifest){
+          global.uc_watcher_debug("Watcher::__construct Writing Manifest");
+          //Me.WriteManifest();
+          Resolve();
+        });
       });
     });
-
-    this.on('Init',this.Watch.bind(this));
   }
   WriteManifest():void{
     global.uc_watcher_debug("Watcher::WriteManifest");
@@ -105,7 +103,7 @@ class WatcherControl{
   static Version = '0.0.1';
   static Init(){
     global.uc_watcher_debug("WatcherControl::Init");
-    H = H(WatcherControl);
+    H = require('../Misc/H')(WatcherControl);
   }
   static FileTypes:Object = {
     'JS': {Compress: false, Compiler: 'Babel', SourceMap: null, IncludedIn:[], Watch:false, Transpile:false},

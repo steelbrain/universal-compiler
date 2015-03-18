@@ -1,7 +1,9 @@
 #!/usr/bin/env nodejs
 
+
+require('coffee-script/register');
 var
-  Compiler = require('../Built/Compiler/Compiler').Compiler;
+  Compiler = require('../Compiler/Compiler').Compiler;
 if(!process.argv[2]){
   console.log("Please Specify a source File");
   process.exit(1);
