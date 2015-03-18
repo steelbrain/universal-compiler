@@ -15,4 +15,8 @@ class H
         else
           ToReturn[Key] = Value
     return ToReturn
+  @ABSPath:(FilePath, FileDir)->
+    if FilePath.substr(0,1) isnt Path.sep and FilePath.substr(1,1) isnt ':'
+      FilePath = FileDir + Path.sep + FilePath
+    FilePath
 module.exports = H
