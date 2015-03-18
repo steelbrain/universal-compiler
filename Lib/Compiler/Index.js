@@ -30,24 +30,26 @@ class Compiler{
     return new Promise(function(Resolve, Reject){
       SourceInfo = new FileInfo(SourceFile);
       if(!SourceInfo.Readable){
-        return Reject(new Error(`Source File ${SourceFile} isn't readable`));
+        return Reject(new Error(`Source File ${SourceFile} isn't readable, is the path correct?`));
       }
       if(!Compiler.Plugins.has(SourceInfo.Extension)){
         return Reject(new Error(`The Extension ${SourceInfo.Extension} is not registered`));
       }
       CompilerPlugin = Compiler.Plugins.get(SourceInfo.Extension);
-      SourceInfo.Opts = H.Merge({}, Compiler.DefaultOpts, Opts, CompilerPlugin.DefaultOpts);
+      SourceInfo.Opts = H.Merge({}, Compiler.DefaultOpt, CompilerPlugin.DefaultOpts, Opts);
       CompilerPlugin.Process(SourceInfo, Opts).then(function(){
+        Debug("Compiler::Compile CompilerPlugin::Processed-Done");
         Resolve(SourceInfo);
       }, Reject);
     });
   }
 }
+
+global.UniversalCompiler = Compiler;
+module.exports = Compiler;
+
 Compiler.H = H;
 Compiler.Debug = Debug;
 Compiler.Plugins = new Map;
 Compiler.DefaultOpts = {TargetFile: null, SourceMap: null, Write:false};
 Compiler.PluginBase = require('./PluginBase');
-
-global.UniversalCompiler = Compiler;
-module.exports = Compiler;
