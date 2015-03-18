@@ -1,7 +1,9 @@
 
 
 "use strict";
-var FS = require('fs');
+var
+  FS = require('fs'),
+  FSPath = require('path');
 class FileInfo{
   constructor(Path){
     try {
@@ -16,6 +18,7 @@ class FileInfo{
     }
     this.Extension = Path.split('.').pop().toUpperCase();
     this.Path = Path;
+    this.Directory = FS.realpathSync(FSPath.dirname(Path));
   }
 }
 module.exports = FileInfo;
