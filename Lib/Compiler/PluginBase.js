@@ -1,19 +1,20 @@
 
 
 "use strict";
-var
-  Compiler = module.parent.exports,
-  FS = require('fs');
+if(typeof UniversalCompiler == 'undefined'){
+  throw new Error("You must include Universal-Compiler First");
+}
+var FS = require('fs');
 class CompilerBase{
   constructor(){
     this.DefaultOpts = {};
     this.ExtractValue = /@([a-zA-z1-9-]*) "(.*)"/;
     this.Tags = new Map([
       ['Compiler-Output', function(Extracts, Line, Number, SourceInfo){
-        SourceInfo.Opts.TargetFile = Compiler.H.ABSPath(Extracts[2],SourceInfo.Directory);
+        SourceInfo.Opts.TargetFile = UniversalCompiler.H.ABSPath(Extracts[2],SourceInfo.Directory);
       }],
       ['Compiler-SourceMap', function(Extracts, Line, Number, SourceInfo){
-        SourceInfo.Opts.SourceMap = Compiler.H.ABSPath(Extracts[2],SourceInfo.Directory);
+        SourceInfo.Opts.SourceMap = UniversalCompiler.H.ABSPath(Extracts[2],SourceInfo.Directory);
       }]
     ]);
     this.CommentBlock = '//';
@@ -41,29 +42,39 @@ class CompilerBase{
     var
       Self = this,
       Promises = [],
+      PreProcessRetVal = null,
       PostProcessRetVal = null;
     return new Promise(function(Resolve,Reject){
       FS.readFile(SourceInfo.Path, function(_, Data){
-        SourceInfo.Content = Data.toString();
-        SourceInfo.Content = SourceInfo.Content.split(SourceInfo.Content.indexOf("\r") > -1 ? "\r\n" : "\n");
-        SourceInfo.Content.forEach(function(Line, Number){
-          if(Line.indexOf(Self.CommentBlock) === -1) return ;
-          Promises.push(Self.ParseLine(Line, Number, SourceInfo));
-        });
-        Promise.all(Promises).then(function(){
-          SourceInfo.Content = SourceInfo.Content.join("\n");
-          SourceInfo.Result = SourceInfo.Content;
-          SourceInfo.SourceMap = null;
-          if(Self.PostProcess){
-            if((PostProcessRetVal = Self.PostProcess(SourceInfo)) instanceof Promise){
-              Promise.then(Resolve);
+        if(Self.PreProcess){
+          if(!((PreProcessRetVal = Self.PreProcess(SourceInfo)) instanceof Promise)){
+            PreProcessRetVal = Promise.resolve();
+          } else {
+            PreProcessRetVal.catch(Reject);
+          }
+        } else {PreProcessRetVal = Promise.resolve();}
+        PreProcessRetVal.then(function(){
+          SourceInfo.Content = Data.toString();
+          SourceInfo.Content = SourceInfo.Content.split(SourceInfo.Content.indexOf("\r") > -1 ? "\r\n" : "\n");
+          SourceInfo.Content.forEach(function(Line, Number){
+            if(Line.indexOf(Self.CommentBlock) === -1) return ;
+            Promises.push(Self.ParseLine(Line, Number, SourceInfo));
+          });
+          Promise.all(Promises).then(function(){
+            SourceInfo.Content = SourceInfo.Content.join("\n");
+            SourceInfo.Result = SourceInfo.Content;
+            SourceInfo.SourceMap = null;
+            if(Self.PostProcess){
+              if((PostProcessRetVal = Self.PostProcess(SourceInfo)) instanceof Promise){
+                PostProcessRetVal.then(Resolve, Reject);
+              } else {
+                Resolve();
+              }
             } else {
               Resolve();
             }
-          } else {
-            Resolve();
-          }
-        }, Reject);
+          }, Reject);
+        });
       });
     });
   }
