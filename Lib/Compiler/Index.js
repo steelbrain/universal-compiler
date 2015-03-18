@@ -5,9 +5,9 @@
 require('coffee-script/register');
 
 var
-  FS = require('fs'),
   Debug = require('debug')('uc-compiler'),
-  H = require('../H');
+  H = require('../H'),
+  FileInfo = require('./FileInfo');
 
 class Compiler{
   static RegisterPlugin(Extensions, PluginClass){
@@ -16,23 +16,38 @@ class Compiler{
     }
     if(Extensions instanceof Array){
       Extensions.forEach(function(Extension){
-        global.uc_compiler_debug(`Registering Plugin ${PluginClass.constructor.name} for Extension ${Extension}`);
-        Compiler[Extension] = PluginClass
+        Compiler.Plugins.set(Extension, PluginClass);
       });
     } else if(typeof Extensions === 'string') {
-      global.uc_compiler_debug(`Registering Plugin ${PluginClass.constructor.name} for Extension ${Extensions}`);
-      Compiler[Extensions] = PluginClass;
+      Compiler.Plugins.set(Extensions, PluginClass);
     }
   }
   static Compile(SourceFile, Opts){
-    Debug(`Compiler::Compile Gonna Compiler ${SourceFile}`);
-    return new Promise(function(Resolve, Reject){
+    Debug('Compiler::Compile Gonna Compiler', SourceFile);
 
+    var SourceInfo, CompilerPlugin;
+
+    return new Promise(function(Resolve, Reject){
+      SourceInfo = new FileInfo(SourceFile);
+      if(!SourceInfo.Readable){
+        return Reject(new Error(`Source File ${SourceFile} isn't readable`));
+      }
+      if(!Compiler.Plugins.has(SourceInfo.Extension)){
+        return Reject(new Error(`The Extension ${SourceInfo.Extension} is not registered`));
+      }
+      CompilerPlugin = Compiler.Plugins.get(SourceInfo.Extension);
+      SourceInfo.Opts = H.Merge({}, Compiler.DefaultOpts, Opts, CompilerPlugin.DefaultOpts);
+      CompilerPlugin.Process(SourceInfo, Opts).then(function(){
+        Resolve(SourceInfo);
+      }, Reject);
     });
   }
 }
-module.exports = Compiler;
+Compiler.H = H;
 Compiler.Debug = Debug;
-Compiler.Plugins = {};
+Compiler.Plugins = new Map;
+Compiler.DefaultOpts = {TargetFile: null, SourceMap: null, Write:false};
 Compiler.PluginBase = require('./PluginBase');
-Compiler.Compile('/tmp/njs/1.js');
+
+global.UniversalCompiler = Compiler;
+module.exports = Compiler;
