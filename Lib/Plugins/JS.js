@@ -9,8 +9,14 @@ class PluginJS extends UniversalCompiler.PluginBase{
     super();
     UniversalCompiler.H.Merge(this.DefaultOpts, {
       Compress: false,
-      Compiler: 'Babel',
+      Transpiler: 'Babel',
       Transpile: false
+    });
+    this.Tags.set('Compiler-Transpile',function (Extracts, Line, Number, SourceInfo) {
+      SourceInfo.Opts.Transpile = Extracts[2] === 'true';
+    });
+    this.Tags.set('Compiler-Compress', function(Extracts, Line, Number, SourceInfo){
+      SourceInfo.Opts.Compress = Extracts[2] === 'true';
     });
   }
 }
