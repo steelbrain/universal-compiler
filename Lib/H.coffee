@@ -1,5 +1,5 @@
 
-
+Path = require('path')
 class H
   @Merge:(ToReturn)->
     ToReturn = ToReturn || {}
