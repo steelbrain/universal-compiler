@@ -16,8 +16,9 @@ class FileInfo{
     } catch(err){
       this.Writable = false;
     }
-    this.Extension = Path.split('.').pop().toUpperCase();
     this.Path = Path;
+    this.FileName = Path.split(FSPath.sep).pop();
+    this.Extension = Path.split('.').pop().toUpperCase();
     this.Directory = FS.realpathSync(FSPath.dirname(Path));
   }
 }
