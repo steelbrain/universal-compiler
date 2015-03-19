@@ -11,7 +11,7 @@ class CompilerBase{
     this.ExtractValue = /@([a-zA-z1-9-]*) "(.*)"/;
     this.Tags = new Map([
       ['Compiler-Output', function(Extracts, Line, Number, SourceInfo){
-        SourceInfo.Opts.TargetFile = UniversalCompiler.H.ABSPath(Extracts[2],SourceInfo.Directory);
+        SourceInfo.Opts.Output = UniversalCompiler.H.ABSPath(Extracts[2],SourceInfo.Directory);
       }],
       ['Compiler-SourceMap', function(Extracts, Line, Number, SourceInfo){
         SourceInfo.Opts.SourceMap = UniversalCompiler.H.ABSPath(Extracts[2],SourceInfo.Directory);

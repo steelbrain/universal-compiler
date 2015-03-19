@@ -36,7 +36,7 @@ class Compiler{
         return Reject(new Error(`The Extension ${SourceInfo.Extension} is not registered`));
       }
       CompilerPlugin = Compiler.Plugins.get(SourceInfo.Extension);
-      SourceInfo.Opts = H.Merge({}, Compiler.DefaultOpt, CompilerPlugin.DefaultOpts, Opts);
+      SourceInfo.Opts = H.Merge({}, Compiler.DefaultOpts, CompilerPlugin.DefaultOpts, Opts);
       CompilerPlugin.Process(SourceInfo, Opts).then(function(){
         Debug("Compiler::Compile CompilerPlugin::Processed-Done");
         Resolve(SourceInfo);
@@ -51,5 +51,5 @@ module.exports = Compiler;
 Compiler.H = H;
 Compiler.Debug = Debug;
 Compiler.Plugins = new Map;
-Compiler.DefaultOpts = {TargetFile: null, SourceMap: null, Write:false};
+Compiler.DefaultOpts = {Output: null, SourceMap: null, Write:false};
 Compiler.PluginBase = require('./PluginBase');
