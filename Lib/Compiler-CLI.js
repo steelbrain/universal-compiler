@@ -10,6 +10,7 @@ var
 Log.enable('uc-compiler-cli');
 Log = Log('uc-compiler-cli');
 require('./Plugins/JS');
+require('./Plugins/CSS');
 class CLI{
   static Init(){
     if(!Opts['_'].length){
