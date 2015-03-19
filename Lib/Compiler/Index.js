@@ -39,6 +39,9 @@ class Compiler{
       SourceInfo.Opts = H.Merge({}, Compiler.DefaultOpts, CompilerPlugin.DefaultOpts, Opts);
       CompilerPlugin.Process(SourceInfo, Opts).then(function(){
         Debug("Compiler::Compile CompilerPlugin::Processed-Done");
+        if(SourceInfo.SourceMap){
+          SourceInfo.SourceMap = typeof SourceInfo.SourceMap === 'string' ? SourceInfo.SourceMap : JSON.stringify(SourceInfo.SourceMap)
+        }
         Resolve(SourceInfo);
       }, Reject);
     });
