@@ -17,7 +17,7 @@ class PluginLess extends UniversalCompiler.PluginBase{
     });
     this.CommentBlock = '//';
   }
-  ProcessLess(SourceInfo){
+  PostProcess(SourceInfo){
     return new Promise(function(Resolve, Reject){
       Less.render(SourceInfo.Result, {
         sourceMap: true,
@@ -31,12 +31,6 @@ class PluginLess extends UniversalCompiler.PluginBase{
         }
         Resolve();
       }, Reject);
-    });
-  }
-  PostProcess(SourceInfo){
-    var Self = this;
-    return new Promise(function(Resolve, Reject){
-      Self.ProcessLess(SourceInfo).then(Resolve, Reject);
     });
   }
 }
