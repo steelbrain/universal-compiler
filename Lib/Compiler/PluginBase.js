@@ -15,6 +15,14 @@ class CompilerBase{
       }],
       ['Compiler-SourceMap', function(Extracts, Line, Number, SourceInfo){
         SourceInfo.Opts.SourceMap = UniversalCompiler.H.ABSPath(Extracts[2],SourceInfo.Directory);
+      }],
+      ['Compiler-Include', function(Extracts, Line, Number, SourceInfo){
+        return new Promise(function(Resolve, Reject){
+          FS.readFile(UniversalCompiler.H.ABSPath(Extracts[2], SourceInfo.Directory), function(Err, Data){
+            if(Err) return Reject(new Error(`Unable to read included file '${Extracts[2]}' from '${SourceInfo.Path}'`));
+            Resolve(Data.toString());
+          });
+        });
       }]
     ]);
     this.CommentBlock = '//';
