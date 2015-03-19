@@ -13,6 +13,7 @@ require('./Plugins/JS');
 require('./Plugins/CSS');
 require('./Plugins/Less');
 require('./Plugins/Coffee');
+require('./Plugins/SASS');
 class CLI{
   static Init(){
     if(!Opts['_'].length){
@@ -38,7 +39,8 @@ class CLI{
         console.log(FileInfo.Result);
       }
     }, function(error){
-      Log(error.message);
+      //Log(error.message);
+      Log(error.stack);
     });
   }
   static NormalizeOpts(Opts){
