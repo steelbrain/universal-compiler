@@ -91,4 +91,7 @@ class PluginJS extends UniversalCompiler.PluginBase{
     });
   }
 }
-UniversalCompiler.RegisterPlugin('JS', new PluginJS);
+var PluginJSInst = new PluginJS;
+UniversalCompiler.RegisterPlugin('JS', PluginJSInst);
+UniversalCompiler.RegisterPlugin('JSX', PluginJSInst);
+UniversalCompiler.RegisterPlugin('TAG', PluginJSInst);
