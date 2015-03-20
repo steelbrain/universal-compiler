@@ -8,7 +8,9 @@ var
   Path = require('path'),
   FSWatcher = require('node-fswatcher'),
   EventEmitter = require('events').EventEmitter,
-  Log = require('debug')('uc-watcher');
+  Log = require('debug');
+Log.enable('uc-watcher');
+Log = Log('uc-watcher');
 class Watcher extends EventEmitter{
   constructor(Dir){
     var Self = this;
