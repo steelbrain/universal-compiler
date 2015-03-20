@@ -8,7 +8,7 @@
   },
   "bin": {
     "uc-compile" : "./Lib/Compiler-CLI.js",
-    "uc-watch" : "./Exec/Watcher.js"
+    "uc-watch" : "./Lib/Watcher-CLI.js"
   },
   "repository": {
     "type": "git",
