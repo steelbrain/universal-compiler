@@ -26,7 +26,8 @@
     "debug": "latest",
     "node-fswatcher": "latest",
     "node-sass": "latest",
-    "minimatch": "latest"
+    "minimatch": "latest",
+    "minimist": "latest"
   },
   "keywords": [
     "compiler",
