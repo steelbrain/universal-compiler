@@ -31,7 +31,9 @@ You can always specify these options as CLI arguments, for example, the command 
 
 ##### UC-Watch
 UC-Watch command watches the directory specified and generates a manifest as `DeProc.json`, after this manifest is generated, You can edit it in an editor of your choice and set `"watch": true` for the files you want UC-Watch to watch changes for.
+
 __Note:__ Make sure to restart uc-watch after you modify the manifest.
+
 __Note:__ You can only exclude files when the manifest is generated, and it's only generated when a DeProc.json file is not present, so You might have to delete your manifest file and regenerate it.
 
 #### Languages Supported
