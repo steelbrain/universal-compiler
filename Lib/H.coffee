@@ -3,7 +3,7 @@ Path = require('path')
 FS = require('fs')
 Minimatch = require('minimatch')
 class H
-  @DefaultExcluded:['.git', '.idea', 'Build', 'build', 'built', 'node_modules']
+  @DefaultExcluded:['.git', '.idea', 'Build', 'build', 'built', 'Built', 'node_modules']
   @Version:'0.0.2'
   @ProcessedMap:{
     'JS': 'js',
@@ -48,9 +48,9 @@ class H
       ++I
     return RelativePath.join(Path.sep) + Path.sep + Path2.join(Path.sep) if RelativePath.length
     return Path2.join(Path.sep);
-  @Manifest:(Dir)->
+  @Manifest:(Dir, Excluded = [])->
     return new Promise (Resolve, Reject)->
-      ToReturn = Name: Path.basename(Dir), Version: H.Version, Excluded: H.DefaultExcluded
+      ToReturn = Name: Path.basename(Dir), Version: H.Version, Excluded: H.DefaultExcluded.concat(Excluded)
       H.ScanDir(Dir, '', ToReturn.Excluded).then (Items)->
         ToReturn.Items = Items;
         Resolve(ToReturn)

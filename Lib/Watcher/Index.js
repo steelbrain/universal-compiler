@@ -12,7 +12,7 @@ var
 Log.enable('uc-watcher');
 Log = Log('uc-watcher');
 class Watcher extends EventEmitter{
-  constructor(Dir){
+  constructor(Dir, Excluded){
     var Self = this;
 
     this.Dir = FS.realpathSync(Dir);
@@ -29,7 +29,7 @@ class Watcher extends EventEmitter{
         });
       } else {
         // Create New
-        UniversalCompiler.H.Manifest(Self.Dir).then(function(Manifest){
+        UniversalCompiler.H.Manifest(Self.Dir, Excluded || []).then(function(Manifest){
           Self.Manifest = Manifest;
           Self.WriteManifest();
           Self.Watch();
@@ -68,8 +68,8 @@ class Watcher extends EventEmitter{
   Close(){
     this.Watcher.Close();
   }
-  static Watch(Dir, Callback){
-    var Inst = new Watcher(Dir);
+  static Watch(Dir, Callback, Excluded){
+    var Inst = new Watcher(Dir, Excluded);
     Inst.once('init', Callback);
     return Inst;
   }

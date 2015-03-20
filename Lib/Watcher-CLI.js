@@ -15,6 +15,7 @@ class CLI{
       throw new Error("Please specify a directory to watch");
     }
     Opts.Watch = true;
+    Opts.Excluded = Opts.Excluded ? Opts.Excluded.split(',') : [];
     try {
       var Stats = FS.statSync(Opts['_'][0]);
     } catch(err){
@@ -24,7 +25,7 @@ class CLI{
       throw new Error(`The input '${Opts['_'][0]}' is not a directory`);
     }
     UniversalCompiler.H.NormalizeOpts(Opts);
-    Watcher.Watch(Opts['_'][0], function(){});
+    Watcher.Watch(Opts['_'][0], function(){}, Opts.Excluded);
   }
 }
 
