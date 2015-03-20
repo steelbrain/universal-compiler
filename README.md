@@ -1,50 +1,45 @@
 Universal-Compiler
 =================
-Universal compiler is a compiler for your Web Assets, Period.
-
-__Note:__ This is a work in progress and I change API every day, So Please don't use it until it's stable.
+Universal-Compiler (aka UC-Compiler) is a Compiler / Minifier / Concatenator / Transpiler for *all* of your web assets.
 
 #### Installation
 ```
-npm install universal-compiler
+npm install -g universal-compiler
 ```
-#### Languages Supported
- - CSS (Minification)
- - LESS
- - CoffeeScript
- - Javascript (ES6 & Minification)
 
 #### Usage
 ```
-cd universal-compiler/Build/
-
-Syntax:
-./Compiler-Exec.js Source [Target] [SourceMapTarget]
-
--- Javascript
-// Compiling /tmp/1.js into /tmp/2.js
-./Compiler-Exec.js /tmp/1.js /tmp/2.js
-// Generating a SourceMap at 2.map
-./Compiler-Exec.js /tmp/1.js /tmp/2.js /tmp/2.map
--- LESS
-// Compiling /tmp/1.less into /tmp/2.css
-./Compiler-Exec.js /tmp/1.less /tmp/2.css
-// Generating a SourceMap at 2.map
-./Compiler-Exec.js /tmp/1.less /tmp/2.css /tmp/2.map
+uc-compile Source [--Output OutputPath]
+uc-watch Directory [--Excluded Dir1,Dir2]
 ```
 
-If the target isn't provided as a CLI argument the compiler will output the compiled file.
-What's my favorite thing about this compiler is that you can actually control the options from the files themselves.
-
+##### UC-Compile
+UC-Compile command compiles the provided file, If a second argument is provided, then it's used as the output location.
+You can always override the options from within the files, for example
 ```js
-// Note: I am 1.js
 // @Compiler-Output "2.js"
 // @Compiler-Sourcemap "2.map"
-window.a = function(){
-  console.log("Aa am A Yo!");
+// @Compiler-Transpile "true"
+class A{
+  constructor(){
+    console.log("A::constructor")
+  }
 }
 ```
-Now running `./Compiler-Exec.js 1.js` will automatically save the file in the path specified in that file.
+You can always specify these options as CLI arguments, for example, the command for the options above would be
+`uc-compile A.js --Output 2.js --SourceMap 2.map --Transpile`
+
+##### UC-Watch
+UC-Watch command watches the directory specified and generates a manifest as `DeProc.json`, after this manifest is generated, You can edit it in an editor of your choice and set `"watch": true` for the files you want UC-Watch to watch changes for.
+__Note:__ Make sure to restart uc-watch after you modify the manifest.
+__Note:__ You can only exclude files when the manifest is generated, and it's only generated when a DeProc.json file is not present, so You might have to delete your manifest file and regenerate it.
+
+#### Languages Supported
+ - CSS
+ - LESS
+ - CoffeeScript
+ - Javascript
+ - SASS
 
 #### License
  Le GPL ;)
