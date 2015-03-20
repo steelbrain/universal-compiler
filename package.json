@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "uc-compile" : "./Exec/Exec.js",
+    "uc-compile" : "./Lib/Compiler-CLI.js",
     "uc-watch" : "./Exec/Watcher.js"
   },
   "repository": {
@@ -24,7 +24,8 @@
     "less": "latest",
     "clean-css": "latest",
     "debug": "latest",
-    "chokidar": "latest"
+    "node-fswatcher": "latest",
+    "node-sass": "latest"
   },
   "keywords": [
     "compiler",
