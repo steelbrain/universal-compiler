@@ -1,8 +1,9 @@
 
 Path = require('path')
 FS = require('fs')
+Minimatch = require('minimatch')
 class H
-  @DefaultExcluded:['.git', '.idea', 'Built', 'Build', 'build', 'built', 'node_modules']
+  @DefaultExcluded:['.git', '.idea', 'Build', 'build', 'built', 'node_modules']
   @Version:'0.0.2'
   @ProcessedMap:{
     'JS': 'js',
@@ -54,22 +55,29 @@ class H
         ToReturn.Items = Items;
         Resolve(ToReturn)
       .catch(Reject)
-  @FileInfo:(FullPath, RelativePath, Name)->
+  @FileInfo:(FullPath, EntryPath, Name)->
     NameChunks = Name.split('.')
     Ext = NameChunks.pop().toUpperCase()
     return unless UniversalCompiler.Plugins.has Ext
-    if RelativePath isnt '' then RelativePath = RelativePath + Path.sep
     FileInfo =
-      Path: RelativePath + Name,
+      Path: EntryPath,
       Name: Name,
       Config: H.Merge({}, UniversalCompiler.Plugins.get(Ext).DefaultOpts, {Watch:false}),
       Type: Ext
-    FileInfo.Config.Output = RelativePath + Name + '-dist.' + H.ProcessedMap[Ext]
+    FilePathWithoutExt = EntryPath.split('.')
+    FilePathWithoutExt.pop()
+    FileInfo.Config.Output = FilePathWithoutExt.join('.') + '-dist.' + H.ProcessedMap[Ext]
     return FileInfo
   @NormalizeOpts:(Opts)->
     for Key in Opts when Opts.hasOwnProperty(Key)
       if Opts[Key] is 'true' then Opts[Key] = true
       else if Opts[Key] is 'false' then Opts[Key] = false
+  @FileExcluded:(FileName, FilePath,Excluded = [])->
+    ToReturn = false
+    Excluded.forEach (Entry)->
+      return if ToReturn
+      ToReturn = Minimatch(FileName, Entry) || Minimatch(FilePath, Entry)
+    return ToReturn
   @ScanDir: (Directory, RelativePath = '', Excluded = [])->
     return new Promise (Resolve)->
       ToReturn = Info: {}, Tree: Dirs:{},Files:[]
@@ -77,6 +85,8 @@ class H
         Promises = []
         Contents.forEach (Entry)->
           FullPath = Directory + '/' + Entry
+          EntryPath = (if RelativePath is '' then RelativePath else RelativePath + Path.sep) + Entry
+          return if H.FileExcluded(Entry, EntryPath, Excluded)
           Promises.push new Promise (ResolveFile)->
             FS.stat FullPath, (_, Stats)->
               if Stats.isDirectory()
@@ -88,7 +98,7 @@ class H
                   ResolveFile()
               else
                 ToReturn.Tree.Files.push Entry
-                FileInfo = H.FileInfo FullPath,RelativePath,Entry
+                FileInfo = H.FileInfo FullPath,EntryPath,Entry
                 ToReturn.Info[FileInfo.Path] = FileInfo if FileInfo
                 ResolveFile()
         Promise.all(Promises).then ->
