@@ -4,7 +4,7 @@ Universal-Compiler (aka UC-Compiler) is a Compiler / Minifier / Concatenator / T
 
 #### Installation
 ```
-npm install -g universal-compiler
+sudo npm install -g universal-compiler
 ```
 
 #### Usage
