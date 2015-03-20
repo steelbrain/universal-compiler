@@ -25,7 +25,8 @@
     "clean-css": "latest",
     "debug": "latest",
     "node-fswatcher": "latest",
-    "node-sass": "latest"
+    "node-sass": "latest",
+    "minimatch": "latest"
   },
   "keywords": [
     "compiler",
