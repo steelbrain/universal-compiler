@@ -34,7 +34,7 @@ class CompilerBase{
       CallbackRetVal = null;
     return new Promise(function(Resolve, Reject){
       Extracts = Self.ExtractValue.exec(Line);
-      if(!Extracts || !Extracts.length || Extracts.length !== 3 || !Self.Tags.has(Extracts[1])) return ;
+      if(!Extracts || !Extracts.length || Extracts.length !== 3 || !Self.Tags.has(Extracts[1])) return Resolve();
       if((CallbackRetVal = Self.Tags.get(Extracts[1])(Extracts, Line, Number, SourceInfo)) instanceof Promise){
         CallbackRetVal.then(function(CallbackRetVal){
           SourceInfo.Content[Number] = CallbackRetVal || '';
