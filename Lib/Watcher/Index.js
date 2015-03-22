@@ -34,7 +34,7 @@ class Watcher extends EventEmitter{
           Self.WriteManifest();
           Self.Watch();
         },function(Error){
-          Self.Watch();
+          Self.emit('error', Error);
         });
       }
     });
@@ -86,9 +86,10 @@ class Watcher extends EventEmitter{
     }
   }
   OnUpdate(Info){
-    if(!this.Files.has(Info.Path)) return ;
-    var FileInfo = this.Files.get(Info.Path);
-    Log(`Watcher::OnChange Triggered for '${Info.Path}'`);
+    var LocalPath = Path.relative(this.Dir, Info.Path);
+    if(!this.Files.has(LocalPath)) return Log(`'${LocalPath}' isn't the file we were watching`);
+    var FileInfo = this.Files.get(LocalPath);
+    Log(`Watcher::OnChange Triggered for '${LocalPath}'`);
     UniversalCompiler.Compile(Info.Path, FileInfo.Opts).then(function(FileInfo){
       if(FileInfo.Opts.Output && FileInfo.Opts.Write){
         try {
