@@ -11,9 +11,9 @@ class H
     'JSX': 'js',
     'TAG': 'js',
     'CSS': 'css',
-    'less': 'css',
-    'scss': 'css',
-    'sass': 'css'
+    'LESS': 'css',
+    'SCSS': 'css',
+    'SASS': 'css'
   }
   @Merge:(ToReturn)->
     ToReturn = ToReturn || {}
