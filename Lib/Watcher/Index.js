@@ -89,9 +89,9 @@ class Watcher extends EventEmitter{
     var LocalPath = Path.relative(this.Dir, Info.Path);
     if(!this.Files.has(LocalPath)) return Log(`'${LocalPath}' isn't the file we were watching`);
     var FileInfo = this.Files.get(LocalPath);
-    Log(`Watcher::OnChange Triggered for '${LocalPath}'`);
-    UniversalCompiler.Compile(Info.Path, FileInfo.Opts).then(function(FileInfo){
-      if(FileInfo.Opts.Output && FileInfo.Opts.Write){
+    Log(`'${LocalPath}' was changed, compiling now.`);
+    UniversalCompiler.Compile(Info.Path, FileInfo.Config).then(function(FileInfo){
+      if(FileInfo.Opts.Output){
         try {
           FS.writeFileSync(FileInfo.Opts.Output, FileInfo.Result);
         } catch(error){
