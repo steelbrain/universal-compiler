@@ -20,7 +20,7 @@ class PluginCoffee extends UniversalCompiler.PluginBase{
     this.Tags.set('Compiler-Bare', function(Extracts, Line, Number, SourceInfo){
       SourceInfo.Opts.Bare = Extracts[2] === 'true';
     });
-    this.CommentBlock = '//';
+    this.CommentBlock = '#';
   }
   ProcessUglify(SourceInfo){
     SourceInfo.Result = UglifyJS.minify(SourceInfo.Result, {fromString: true}).code;
