@@ -4,7 +4,7 @@
 if(typeof UniversalCompiler == 'undefined'){
   throw new Error("You must include Universal-Compiler First");
 }
-var SASS = require('node-sass');
+var SASS = uc_require('node-sass');
 class PluginSASS extends UniversalCompiler.PluginBase{
   constructor(){
     super();

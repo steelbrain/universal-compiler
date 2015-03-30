@@ -49,6 +49,15 @@ class Compiler{
 }
 
 global.UniversalCompiler = Compiler;
+global.uc_require = function(Name){
+  try {
+    return require(Name);
+  } catch(error){
+    //TODO: Tell the user to install the missing module
+    console.log(error.stack);
+    process.exit()
+  }
+};
 module.exports = Compiler;
 
 Compiler.H = H;

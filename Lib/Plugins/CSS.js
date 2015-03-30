@@ -4,7 +4,7 @@
 if(typeof UniversalCompiler == 'undefined'){
   throw new Error("You must include Universal-Compiler First");
 }
-var CleanCSS = new (require('clean-css'))({sourceMap: true});
+var CleanCSS = new (uc_require('clean-css'))({sourceMap: true});
 class PluginCSS extends UniversalCompiler.PluginBase{
   constructor(){
     super();

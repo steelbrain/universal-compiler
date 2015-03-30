@@ -5,8 +5,8 @@ if(typeof UniversalCompiler == 'undefined'){
   throw new Error("You must include Universal-Compiler First");
 }
 var
-  Coffee = require('coffee-script'),
-  UglifyJS = require('uglify-js');
+  Coffee = uc_require('coffee-script'),
+  UglifyJS = uc_require('uglify-js');
 class PluginCoffee extends UniversalCompiler.PluginBase{
   constructor(){
     super();

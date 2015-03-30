@@ -6,10 +6,10 @@ if(typeof UniversalCompiler == 'undefined'){
 }
 var
   KnownCompilers = ['BABEL','RIOT','REACT-TOOLS'],
-  Babel = require('babel'),
-  Riot = require('riot'),
-  ReactTools = require('react-tools'),
-  UglifyJS = require('uglify-js');
+  Babel = uc_require('babel'),
+  Riot = uc_require('riot'),
+  ReactTools = uc_require('react-tools'),
+  UglifyJS = uc_require('uglify-js');
 class PluginJS extends UniversalCompiler.PluginBase{
   constructor(){
     super();

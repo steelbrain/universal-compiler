@@ -5,7 +5,7 @@ if(typeof UniversalCompiler == 'undefined'){
   throw new Error("You must include Universal-Compiler First");
 }
 var
-  Less = require('less');
+  Less = uc_require('less');
 class PluginLess extends UniversalCompiler.PluginBase{
   constructor(){
     super();
