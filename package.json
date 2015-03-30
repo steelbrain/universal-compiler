@@ -1,8 +1,8 @@
 {
   "name": "universal-compiler",
   "version": "1.0.5",
-  "description": "A universal Compiler for NodeJS",
-  "main": "./Main.js",
+  "description": "A Compiler / Minifier / Concatenator / Transpiler for your web assets",
+  "main": "Main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
