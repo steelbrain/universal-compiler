@@ -44,4 +44,5 @@ __Note:__ You can only exclude files when the manifest is generated, and it's on
  - SASS
 
 #### License
- Le GPL ;)
+
+This Project is licensed under the terms of GPLv3 License. See the LICENSE file for more info.
