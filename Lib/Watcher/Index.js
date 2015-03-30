@@ -96,24 +96,24 @@ class Watcher extends EventEmitter{
           FS.writeFileSync(FileInfo.Opts.Output, FileInfo.Result);
         } catch(error){
           error = new Error(`Permission denied, can't write output to file '${FileInfo.Opts.Output}'`);
-          this.emit('error', error);
-          return Log(error.message);
+          Log(error.message);
+          return this.emit('error', error);
         }
         if(FileInfo.Opts.SourceMap){
           try {
             FS.writeFileSync(FileInfo.Opts.SourceMap, FileInfo.SourceMap);
           } catch(error){
             error = new Error(`Permission denied, can't write sourcemap to file '${FileInfo.Opts.SourceMap}'`);
-            this.emit('error', error);
-            return Log(error.message);
+            Log(error.message);
+            return this.emit('error', error);
           }
         }
       } else {
         console.log(FileInfo.Result);
       }
-    }, function(error){
-      this.emit('error',error);
+    }.bind(this), function(error){
       Log(error.message);
+      this.emit('error',error);
     }.bind(this));
   }
 }
