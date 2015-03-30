@@ -14,6 +14,9 @@
     "type": "git",
     "url": "https://github.com/steelbrain/Universal-Compiler"
   },
+  "optionalDependencies":{
+    "node-sass": "latest"
+  },
   "dependencies":{
     "uglify-js": "latest",
     "babel": "latest",
@@ -25,7 +28,6 @@
     "clean-css": "latest",
     "debug": "latest",
     "node-fswatcher": "latest",
-    "node-sass": "latest",
     "minimatch": "latest",
     "minimist": "latest"
   },
