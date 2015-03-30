@@ -54,8 +54,7 @@ global.uc_require = function(Name){
     return require(Name);
   } catch(error){
     //TODO: Tell the user to install the missing module
-    console.log(error.stack);
-    process.exit()
+    return null;
   }
 };
 module.exports = Compiler;
