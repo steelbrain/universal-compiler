@@ -1,6 +1,6 @@
 {
   "name": "universal-compiler",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A Compiler / Minifier / Concatenator / Transpiler for your web assets",
   "main": "Main.js",
   "scripts": {
