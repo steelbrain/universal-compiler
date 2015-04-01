@@ -45,5 +45,8 @@
   "license": "GPL",
   "bugs": {
     "url": "https://github.com/steelbrain/Universal-Compiler/issues"
+  },
+  "scripts":{
+    "prepublish": "uc-compile Lib/H.coffee"
   }
 }
