@@ -1,4 +1,6 @@
 
+
+# @Compiler-Output "H.js"
 Path = require('path')
 FS = require('fs')
 Minimatch = require('minimatch')
