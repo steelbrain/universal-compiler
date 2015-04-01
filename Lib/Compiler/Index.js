@@ -2,11 +2,9 @@
 
 "use strict";
 
-require('coffee-script/register');
-
 var
   Debug = require('debug')('uc-compiler'),
-  H = require('../H'),
+  H = require('../H.js'),
   FileInfo = require('./FileInfo');
 
 class Compiler{
