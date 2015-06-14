@@ -23,7 +23,7 @@ class UniVoc{
 }
 UniVoc.Plugins = new Map
 UniVoc.H = Helpers
-require('./Plugins/JS').Register(UniVoc)
-require('./Plugins/Babel').Register(UniVoc)
-require('./Plugins/UglifyJS').Register(UniVoc)
+try {
+  require('univoc-js').Register(UniVoc)
+} catch(err){} // Fail silently if it's not installed
 module.exports = UniVoc

@@ -42,7 +42,7 @@
     "es6"
   ],
   "author": "steelbrain",
-  "license": "GPL",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/steelbrain/UniVoc/issues"
   },
