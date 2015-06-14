@@ -1,5 +1,5 @@
 "use strict"
-let DuplexStream = require('stream').Duplex
+let TransformStream = require('stream').Transform
 class UniVocPlugin {
   static Process(FilePath, Opts, Buffer){
     return new Promise(function(Resolve){
@@ -7,18 +7,15 @@ class UniVocPlugin {
     })
   }
   static Stream(FilePath, Opts){
-    let Stream = DuplexStream()
-    let Buffers = []
-    let Deferred = Promise.defer()
-    Stream._read = function(){
-      Deferred.promise.then(function(){
-        return UniVocPlugin.Process(FilePath, Opts, (new Buffer).concat(Buffers))
+    let Stream = new TransformStream({objectMode: true})
+    let Me = this
+    Stream._transform = function(Chunk, _, Callback){
+      Me.Process(FilePath, Opts, Chunk).then(function(Output){
+        Stream.push(Output)
+        Callback()
       })
     }
-    Stream._write = function(Chunk, Encoding){
-      Buffers.push(Chunk)
-      if(Chunk === null) Deferred.resolve()
-    }
+    return Stream
   }
   static Register(UniVoc){
     if(!UniVoc.Plugins.has(this.Ext)){
