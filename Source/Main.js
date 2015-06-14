@@ -2,6 +2,8 @@
 let FS = require('fs')
 let Path = require('path')
 let Helpers = require('./Helpers')
+let Promise = require('a-promise');
+
 class UniVoc{
   static ProcessFile(FilePath){
     let Ext = Path.extname(FilePath).substr(1)

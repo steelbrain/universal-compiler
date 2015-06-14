@@ -18,9 +18,6 @@
     "node-sass": "latest"
   },
   "dependencies":{
-    "uglify-js": "latest",
-    "babel": "latest",
-    "react-tools": "latest",
     "riot": "latest",
     "a-promise": "latest",
     "coffee-script": "latest",
