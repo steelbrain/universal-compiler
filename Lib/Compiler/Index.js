@@ -62,7 +62,6 @@ Compiler.Debug = Debug;
 Compiler.Plugins = new Map;
 Compiler.DefaultOpts = {Output: null, SourceMap: null, Write:false};
 Compiler.PluginBase = require('./PluginBase');
-require('../Plugins/JS');
 require('../Plugins/CSS');
 require('../Plugins/Less');
 require('../Plugins/Coffee');
