@@ -1,31 +1,29 @@
 "use strict"
 let FS = require('fs')
+let Path = require('path')
 let Helpers = require('./Helpers')
 class UniVoc{
-  static ProcessFile(Path){
-    let Ext = Path.split('.')
-    let Opts = {Output: null}
-    Ext = Ext[ Ext.length - 1 ]
+  static ProcessFile(FilePath){
+    let Ext = Path.extname(FilePath).substr(1)
+    let Opts = {Output: null, Path: FilePath}
     return new Promise(function(Resolve){
       if(!UniVoc.Plugins.has(Ext)){
         throw new Error(`Provided filetype '${Ext}' isn't recognized`)
       }
-      FS.access(Path, FS.R_OK, Resolve)
+      FS.access(FilePath, FS.R_OK, Resolve)
     }).then(function(Access){
         if(Access !== null) throw Access
-        let Stream = FS.createReadStream(Path)
+        let Stream = FS.createReadStream(FilePath)
         for(let Plugin of UniVoc.Plugins.get(Ext)){
-          Stream = Stream.pipe(Plugin[1].Stream(Path, Opts))
+          Stream = Stream.pipe(Plugin[1].Stream(UniVoc, Opts))
         }
         return Stream
       })
   }
 }
 UniVoc.Plugins = new Map
+UniVoc.H = Helpers
 require('./Plugins/JS').Register(UniVoc)
-UniVoc.ProcessFile("/var/web/PublishSpace/dQuery/Source/Compile.js").then(function(Stream){
-  Stream.pipe(FS.createWriteStream("/tmp/test"))
-  console.log(`Promise Result`)
-}, function(e){
-  console.log(e.stack)
-})
+require('./Plugins/Babel').Register(UniVoc)
+require('./Plugins/UglifyJS').Register(UniVoc)
+module.exports = UniVoc
