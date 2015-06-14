@@ -1,3 +1,4 @@
+"use strict"
 module.exports = {
   extend: function(Out){
     Out = typeof Out === 'object' ? Out : {}
