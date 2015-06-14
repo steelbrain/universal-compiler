@@ -13,5 +13,5 @@ class UniVocUglifyJS extends Base{
   }
 }
 UniVocUglifyJS.Name = 'UglifyJS'
-UniVocUglifyJS.Ext = 'js'
+UniVocUglifyJS.Ext = ['js', 'jsx', 'tag']
 module.exports = UniVocUglifyJS

@@ -48,10 +48,15 @@ class UniVocPlugin {
       })
   }
   static Register(UniVoc){
-    if(!UniVoc.Plugins.has(this.Ext)){
-      UniVoc.Plugins.set(this.Ext, new Map())
+    for(let Name of this.Ext){
+      this.__register(UniVoc, Name)
     }
-    UniVoc.Plugins.get(this.Ext).set(this.Name, this)
+  }
+  static __register(UniVoc, Ext){
+    if(!UniVoc.Plugins.has(Ext)){
+      UniVoc.Plugins.set(Ext, new Map())
+    }
+    UniVoc.Plugins.get(Ext).set(this.Name, this)
   }
 }
 UniVocPlugin.Tags = new Map()

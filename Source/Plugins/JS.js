@@ -15,5 +15,5 @@ UniVocJS.Tags.set('Compiler-Transpile', function(Name, Value, _, Opts){
   Opts.Transpile = Value === 'true'
 })
 UniVocJS.Name = 'JS'
-UniVocJS.Ext = 'js'
+UniVocJS.Ext = ['js', 'jsx', 'tag']
 module.exports = UniVocJS

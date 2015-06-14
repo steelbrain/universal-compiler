@@ -16,5 +16,5 @@ class UniVocBabel extends Base{
   }
 }
 UniVocBabel.Name = 'Babel'
-UniVocBabel.Ext = 'js'
+UniVocBabel.Ext = ['js', 'jsx', 'tag']
 module.exports = UniVocBabel
