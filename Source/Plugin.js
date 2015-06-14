@@ -1,17 +1,20 @@
 "use strict"
 let TransformStream = require('stream').Transform
+let FS = require('fs')
+let Path = require('path')
 class UniVocPlugin {
-  static Process(UniVoc, FilePath, Opts, Buffer){
+  // An abstract method to be extended by plugins
+  static Process(UniVoc, Opts, Buffer){
     return new Promise(function(Resolve){
       Resolve(Buffer)
     })
   }
   // Called by UniVoc in CompileFile
-  static Stream(UniVoc, FilePath, Opts){
+  static Stream(UniVoc, Opts){
     let Stream = new TransformStream({objectMode: true})
     let Me = this
     Stream._transform = function(Chunk, _, Callback){
-      Me.Process(UniVoc, FilePath, Opts, Chunk).then(function(Output){
+      Me.Process(UniVoc, Opts, Chunk).then(function(Output){
         Stream.push(Output)
         Callback()
         Me = null
@@ -26,9 +29,14 @@ class UniVocPlugin {
       let Result
       let Promises = []
       while((Result = Regex.exec(Buffer)) !== null){
-        if(Me.Tags.has(Result[1])){
-          Promises.push(Me.Tags.get(Result[1])(Result[1], Result[2], Buffer, Opts) || '')
-        } else Promises.push(Result[0])
+        try {
+          if(Me.Tags.has(Result[1])){
+            Promises.push(Me.Tags.get(Result[1])(Result[1], Result[2], Buffer, Opts) || '')
+          } else Promises.push(Result[0])
+        } catch(Err){
+          console.error(Err)
+          Promises.push(Result[0])
+        }
       }
       Resolve(Promise.all(Promises))
     }).then(function(Results){
@@ -52,6 +60,13 @@ UniVocPlugin.Comments = '//'
 UniVocPlugin.Ext = ''
 UniVocPlugin.Options = {}
 UniVocPlugin.Tags.set('Compiler-Output', function(Name, Value, Buffer, Opts){
-  Opts.Output = Value
+  Opts.Output = Path.resolve(Path.dirname(Opts.Path), Value)
+})
+UniVocPlugin.Tags.set('Compiler-Include', function(Name, Value, Buffer, Opts){
+  return new Promise(function(Resolve){
+    FS.readFile(Path.resolve(Path.dirname(Opts.Path), Value), function(_, Contents){
+      Resolve(Contents || '')
+    })
+  })
 })
 module.exports = UniVocPlugin
