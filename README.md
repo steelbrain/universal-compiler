@@ -2,6 +2,10 @@ Universal-Compiler
 =================
 Universal-Compiler (aka UC-Compiler) is a Compiler / Minifier / Concatenator / Transpiler for *all* of your web assets.
 
+
+### Abandoned
+This project is no longer supported in favor of it's successor [UCompiler](https://github.com/steelbrain/UCompiler)
+
 #### Installation
 ```
 sudo npm install -g universal-compiler
