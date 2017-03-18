@@ -1,5 +1,7 @@
 Universal-Compiler
 =================
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/steelbrain/Universal-Compiler.svg)](https://greenkeeper.io/)
 Universal-Compiler (aka UC-Compiler) is a Compiler / Minifier / Concatenator / Transpiler for *all* of your web assets.
 
 
